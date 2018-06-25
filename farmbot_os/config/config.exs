@@ -30,6 +30,10 @@ config :lager, :handlers, []
 
 config :ssl, protocol_version: :"tlsv1.2"
 
+# Disable tzdata autoupdates because it tries to dl the update file
+# Before we have network or ntp.
+config :tzdata, :autoupdate, :disabled
+
 config :farmbot_core, :behaviour,
   firmware_handler: Farmbot.Firmware.StubHandler
 
