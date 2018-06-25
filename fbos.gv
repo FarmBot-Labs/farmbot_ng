@@ -1,0 +1,8 @@
+digraph fbos {
+  "farmbot_os" -> "farmbot_ext"   [ label = "path" ]
+  "farmbot_os" -> "farmbot_core" [ label = "path" ]
+  "farmbot_core" -> "farmbot-arduino-firmware" [ label = "submodule" ]
+  "nerves_system_farmbot_rpi3" -> "buildroot-packages" [ label = "submodule" ]
+  "farmbot_os" -> "farmbot_scripting" [ label = "path" ]
+  "farmbot_os" -> "nerves_system_farmbot_rpi3" [ label = "hex.pm" ]
+}
