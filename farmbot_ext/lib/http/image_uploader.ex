@@ -20,13 +20,18 @@ defmodule Farmbot.HTTP.ImageUploader do
     Application.put_env(:fs, :path, @images_path)
     File.rm_rf!   @images_path
     File.mkdir_p! @images_path
+    Farmbot.Registry.subscribe()
     :fs_app.start(:normal, [])
     :fs.subscribe()
-    {:ok, %{uploads: %{}}}
+    {:ok, %{uploads: %{}, state_cache: Farmbot.BotState.fetch()}}
   end
 
   def terminate(reason, _state) do
     Farmbot.Logger.debug 3, "Image uploader terminated: #{inspect reason}"
+  end
+
+  def handle_info({Farmbot.Registry, {Farmbot.BotState, bot_state}}, state) do
+    {:noreply, %{state | state_cache: bot_state}}
   end
 
   def handle_info({_pid, {:fs, :file_event}, {path, _}}, state) do
@@ -36,7 +41,7 @@ defmodule Farmbot.HTTP.ImageUploader do
     end) |> is_nil() |> Kernel.!()
     if matches? and (not already_uploading?) do
       Farmbot.Logger.info 2, "Uploading: #{path}"
-      %{x: x, y: y, z: z} = Farmbot.BotState.get_current_pos()
+      %{x: x, y: y, z: z} = state.state_cache.location_data.position
       meta = %{x: x, y: y, z: z, name: Path.rootname(path)}
       pid = spawn __MODULE__, :upload, [path, meta]
       Process.monitor(pid)

@@ -1,0 +1,3 @@
+[submodule "farmbot_core/c_src/farmbot-arduino-firmware"]
+	path = farmbot_core/c_src/farmbot-arduino-firmware
+	url = git@github.com:Farmbot/Farmbot-Arduino-Firmware.git
