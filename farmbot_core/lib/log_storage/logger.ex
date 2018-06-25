@@ -4,7 +4,6 @@ defmodule Farmbot.Logger do
   """
 
   alias Farmbot.Logger.Repo
-  import Ecto.Query, only: [from: 2]
 
   @doc "Send a debug message to log endpoints"
   defmacro debug(verbosity, message, meta \\ []) do

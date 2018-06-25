@@ -2,7 +2,7 @@ defmodule FarmbotCore.MixProject do
   use Mix.Project
 
   @target System.get_env("MIX_TARGET") || "host"
-  @version Path.join(__DIR__, "VERSION") |> File.read!() |> String.trim()
+  @version Path.join([__DIR__, "..", "VERSION"]) |> File.read!() |> String.trim()
 
   defp commit do
     System.cmd("git", ~w"rev-parse --verify HEAD") |> elem(0) |> String.trim()
@@ -77,7 +77,8 @@ defmodule FarmbotCore.MixProject do
         %{
           "ERL_EI_INCLUDE_DIR" =>
             Path.join([:code.root_dir(), "usr", "include"]),
-          "ERL_EI_LIBDIR" => Path.join([:code.root_dir(), "usr", "lib"]),
+          "ERL_EI_LIBDIR" =>
+            Path.join([:code.root_dir(), "usr", "lib"]),
           "MIX_TARGET" => @target
         }
 

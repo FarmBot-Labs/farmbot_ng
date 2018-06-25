@@ -1,10 +1,10 @@
 defmodule Farmbot.Project do
   @moduledoc "Farmbot project config"
 
-  @version Mix.Project.config[:version] || "0.1.0"
-  @target Mix.Project.config[:target] || "host"
-  @commit Mix.Project.config[:commit] || "fixme"
-  @arduino_commit Mix.Project.config[:arduino_commit] || "fixme"
+  @version Mix.Project.config[:version] || Mix.raise("Something broke")
+  @target Mix.Project.config[:target] || Mix.raise("Something broke")
+  @commit Mix.Project.config[:commit] || Mix.raise("Something broke")
+  @arduino_commit Mix.Project.config[:arduino_commit] || Mix.raise("Something broke")
   @env Mix.env()
 
   @doc "*#{@version}*"
