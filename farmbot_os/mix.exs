@@ -32,7 +32,7 @@ defmodule Farmbot.OS.MixProject do
   def application do
     [
       mod: {Farmbot.OS, []},
-      extra_applications: [:logger, :runtime_tools],
+      extra_applications: [:logger, :runtime_tools, :eex],
       included_applications: [:farmbot_core, :farmbot_ext]
     ]
   end
@@ -41,10 +41,16 @@ defmodule Farmbot.OS.MixProject do
   defp deps do
     [
       {:nerves, "~> 1.0", runtime: false},
+      {:nerves_firmware, "~> 0.4.0"},
       {:shoehorn, "~> 0.2"},
+
+      {:dhcp_server, "~> 0.4.0"},
+      {:mdns, "~> 1.0"},
+
       {:cowboy, "~> 1.0.0"},
       {:plug, "~> 1.0"},
       {:cors_plug, "~> 1.5"},
+      {:phoenix_html, "~> 2.11"},
 
       {:farmbot_core, path: "../farmbot_core", env: Mix.env()},
       {:farmbot_ext, path: "../farmbot_ext", env: Mix.env()}

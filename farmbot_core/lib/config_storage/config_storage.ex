@@ -3,10 +3,25 @@ defmodule Farmbot.Config do
 
   alias Farmbot.Config.{
     Repo,
-    Config, Group, BoolValue, FloatValue, StringValue
+    Config, Group, BoolValue, FloatValue, StringValue, NetworkInterface
   }
 
   import Ecto.Query, only: [from: 2]
+
+  @doc "Input a network config. Takes many settings as a map."
+  def input_network_config!(%{} = config) do
+    Farmbot.Config.destroy_all_network_configs()
+    data = struct(NetworkInterface, config)
+    Repo.insert!(data)
+  end
+
+  def get_all_network_configs do
+    Repo.all(NetworkInterface)
+  end
+
+  def destroy_all_network_configs do
+    Repo.delete_all(NetworkInterface)
+  end
 
   @doc "Please be careful with this. It uses a lot of queries."
   def get_config_as_map do

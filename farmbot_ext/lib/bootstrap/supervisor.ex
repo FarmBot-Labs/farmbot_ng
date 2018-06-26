@@ -21,7 +21,6 @@ defmodule Farmbot.Bootstrap.Supervisor do
 
       defmodule Farmbot.Configurator do
         @moduledoc false
-        @behaviour Farmbot.System.Init
         @behaviour Farmbot.Bootstrap.Authorization
 
         # Callback for Farmbot.System.Init.
@@ -75,10 +74,6 @@ defmodule Farmbot.Bootstrap.Supervisor do
   end
 
   def init([]) do
-    Farmbot.Config.update_config_value(:string, "authorization", "email", "connor@farmbot.io")
-    Farmbot.Config.update_config_value(:string, "authorization", "password", "password1234")
-    Farmbot.Config.update_config_value(:string, "authorization", "server", "https://my.farmbot.io")
-    Farmbot.Config.update_config_value(:bool, "settings", "first_boot", true)
     # Make sure we log when amqp is connected.
     update_config_value(:bool, "settings", "log_amqp_connected", true)
 

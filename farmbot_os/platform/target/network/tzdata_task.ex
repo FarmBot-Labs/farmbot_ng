@@ -1,7 +1,7 @@
 defmodule Farmbot.Target.Network.TzdataTask do
   use GenServer
 
-  @fb_data_dir Path.join(Application.get_env(:farmbot, :data_path), "tmp_downloads")
+  @fb_data_dir Path.join(Application.get_env(:farmbot_ext, :data_path), "tmp_downloads")
   @timer_ms round(1.2e+6) # 20 minutes
 
   def start_link(_, _) do

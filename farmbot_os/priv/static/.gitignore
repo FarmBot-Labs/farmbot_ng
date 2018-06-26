@@ -1,0 +1,13 @@
+*
+!.gitignore
+!easter_eggs.json
+!farmbot_logo.png
+!*.html
+!farmware_schema.json
+!templates
+!templates/*
+!styles.css
+!favicon.ico
+*.fw
+!signal_table.js
+!*.svg

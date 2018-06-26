@@ -1,7 +1,8 @@
 defmodule Farmbot.Target.Network.Manager do
+  @moduledoc "Manages a network connection."
   use GenServer
-  use Farmbot.Logger
-  alias Farmbot.System.ConfigStorage
+  require Farmbot.Logger
+  alias Farmbot.Config
   alias Nerves.Network
   alias Farmbot.Target.Network.Ntp
   import Farmbot.Target.Network, only: [test_dns: 0]
@@ -15,13 +16,13 @@ defmodule Farmbot.Target.Network.Manager do
   end
 
   def init({interface, opts} = args) do
-    Logger.busy(3, "Waiting for interface #{interface} up.")
+    Farmbot.Logger.busy(3, "Waiting for interface #{interface} up.")
 
     unless interface in Nerves.NetworkInterface.interfaces() do
       Process.sleep(1000)
       init(args)
     end
-    Logger.success(3, "Interface #{interface} is up.")
+    Farmbot.Logger.success(3, "Interface #{interface} is up.")
 
     SystemRegistry.register()
     {:ok, _} = Elixir.Registry.register(Nerves.NetworkInterface, interface, [])
@@ -62,38 +63,38 @@ defmodule Farmbot.Target.Network.Manager do
   end
 
   def handle_info({Nerves.WpaSupplicant, {:INFO, "WPA: 4-Way Handshake failed - pre-shared key may be incorrect"}, _}, state) do
-    Logger.error 1, "Incorrect PSK."
+    Farmbot.Logger.error 1, "Incorrect PSK."
     Farmbot.System.factory_reset("WIFI Authentication failed. (incorrect psk)")
     {:stop, :normal, state}
   end
 
   def handle_info({Nerves.WpaSupplicant, :"CTRL-EVENT-NETWORK-NOT-FOUND", _}, %{not_found_timer: nil} = state) do
-    first_boot = ConfigStorage.get_config_value(:bool, "settings", "first_boot")
+    first_boot = Config.get_config_value(:bool, "settings", "first_boot")
     # stored in minutes
-    delay_timer = (ConfigStorage.get_config_value(:float, "settings", "network_not_found_timer") || 1) *  60_000
+    delay_timer = (Config.get_config_value(:float, "settings", "network_not_found_timer") || 1) *  60_000
     maybe_hidden? = Keyword.get(state.opts, :maybe_hidden, false)
     cond do
       # Check if the network might be hidden first.
       maybe_hidden? ->
-        Logger.warn 1, "Possibly hidden network not found. Starting timer (hidden=#{maybe_hidden?})"
+        Farmbot.Logger.warn 1, "Possibly hidden network not found. Starting timer (hidden=#{maybe_hidden?})"
         timer = Process.send_after(self(), :network_not_found_timer, round(delay_timer))
         {:noreply, %{state | not_found_timer: timer, connected: false}}
 
       # If its not hidden, just reset. Probably a typo.
       first_boot ->
-        Logger.error 1, "Network not found"
+        Farmbot.Logger.error 1, "Network not found"
         Farmbot.System.factory_reset("WIFI Authentication failed. (network not found)")
         {:stop, :normal, state}
 
       # If not first boot, and we have a valid number for the delay timer.
       delay_timer > 0 ->
-        Logger.warn 1, "Network not found. Starting timer (hidden=#{maybe_hidden?})"
+        Farmbot.Logger.warn 1, "Network not found. Starting timer (hidden=#{maybe_hidden?})"
         timer = Process.send_after(self(), :network_not_found_timer, round(delay_timer))
         {:noreply, %{state | not_found_timer: timer, connected: false}}
 
       # I don't think this can even happen.
       is_nil(delay_timer) ->
-        Logger.error 1, "Network not found"
+        Farmbot.Logger.error 1, "Network not found"
         Farmbot.System.factory_reset("WIFI Authentication failed. (network not found)")
         {:stop, :normal, state}
     end
@@ -105,10 +106,10 @@ defmodule Farmbot.Target.Network.Manager do
 
   def handle_info(:network_not_found_timer, state) do
     if state.connected do
-      Logger.warn 1, "Not resetting because network is connected."
+      Farmbot.Logger.warn 1, "Not resetting because network is connected."
       {:noreply, %{state | not_found_timer: nil}}
     else
-      Logger.error 1, "Network not found"
+      Farmbot.Logger.error 1, "Network not found"
       Farmbot.System.factory_reset("WIFI Authentication failed. (network not found after timer)")
       {:stop, :normal, state}
     end
@@ -124,26 +125,26 @@ defmodule Farmbot.Target.Network.Manager do
       {:ok, {:hostent, _host_name, aliases, :inet, 4, _}} ->
         # If we weren't previously connected, send a log.
         unless state.connected do
-          Logger.success 3, "Farmbot was reconnected to the internet: #{inspect aliases}"
-          Farmbot.System.Registry.dispatch(:network, :dns_up)
+          Farmbot.Logger.success 3, "Farmbot was reconnected to the internet: #{inspect aliases}"
+          Farmbot.Registry.dispatch(__MODULE__, {:dns, :up})
         end
         {:noreply, %{state | connected: true, dns_timer: restart_dns_timer(nil, 45_000)}}
       {:error, err} ->
-        Farmbot.System.Registry.dispatch(:network, :dns_down)
-        Logger.warn 3, "Farmbot was disconnected from the internet: #{inspect err}"
+        Farmbot.Registry.dispatch(__MODULE__, {:dns, :down})
+        Farmbot.Logger.warn 3, "Farmbot was disconnected from the internet: #{inspect err}"
         {:noreply, %{state | connected: false, dns_timer: restart_dns_timer(nil, 10_000)}}
     end
   end
 
   def handle_info(_event, state) do
-    # Logger.warn 3, "unhandled network event: #{inspect event}"
+    # Farmbot.Logger.warn 3, "unhandled network event: #{inspect event}"
     {:noreply, state}
   end
 
   defp cancel_timer(timer) do
     # If there was a timer, cancel it.
     if timer do
-      # Logger.warn 3, "Cancelling Network timer"
+      # Farmbot.Logger.warn 3, "Cancelling Network timer"
       Process.cancel_timer(timer)
     end
     nil
@@ -170,7 +171,7 @@ defmodule Farmbot.Target.Network.Manager do
       :ok -> Process.send_after(self(), :ntp_timer, 1024000 + rand)
       # If time failed, try again in about 5 minutes.
       _ ->
-        if Farmbot.System.ConfigStorage.get_config_value(:bool, "settings", "first_boot") do
+        if Config.get_config_value(:bool, "settings", "first_boot") do
           Process.send_after(self(), :ntp_timer, 10_000 + rand)
         else
           Process.send_after(self(), :ntp_timer, 300000 + rand)

@@ -44,6 +44,7 @@ config :farmbot_core,
   firmware_io_logs: false,
   farm_event_debug_log: false
 
+
 config :farmbot_core, Farmbot.Config.Repo,
   adapter: Sqlite.Ecto2,
   loggers: [],
@@ -71,4 +72,5 @@ config :farmbot_ext,
   data_path: "/tmp"
 
 config :farmbot_os,
-  ecto_repos: [Farmbot.Config.Repo, Farmbot.Logger.Repo, Farmbot.Asset.Repo]
+  ecto_repos: [Farmbot.Config.Repo, Farmbot.Logger.Repo, Farmbot.Asset.Repo],
+  captive_portal_address: "192.168.24.1"

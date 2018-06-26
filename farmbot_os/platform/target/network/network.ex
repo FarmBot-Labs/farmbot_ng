@@ -1,15 +1,13 @@
 defmodule Farmbot.Target.Network do
   @moduledoc "Bring up network."
 
-  @behaviour Farmbot.System.Init
-  alias Farmbot.System.ConfigStorage
-  import ConfigStorage, only: [get_config_value: 3]
-  alias ConfigStorage.NetworkInterface
+  import Farmbot.Config, only: [get_config_value: 3, get_all_network_configs: 0]
+  alias Farmbot.Config.NetworkInterface
   alias Farmbot.Target.Network.Manager, as: NetworkManager
   alias Farmbot.Target.Network.ScanResult
 
   use Supervisor
-  use Farmbot.Logger
+  require Farmbot.Logger
 
   @doc "List available interfaces. Removes unusable entries."
   def get_interfaces(tries \\ 5)
@@ -87,7 +85,7 @@ defmodule Farmbot.Target.Network do
 
   def test_dns(nil) do
     case get_config_value(:string, "authorization", "server") do
-      nil -> 'nerves-project.org'
+      nil -> 'nerves-project.org' # TODO(Connor) - Make this configurable
       <<"https://" <> host :: binary>> -> test_dns(to_charlist(host))
       <<"http://"  <> host :: binary>> -> test_dns(to_charlist(host))
     end
@@ -101,7 +99,7 @@ defmodule Farmbot.Target.Network do
   def to_network_config(config)
 
   def to_network_config(%NetworkInterface{type: "wireless"} = config) do
-    Logger.debug(3, "wireless network config: ssid: #{config.ssid}")
+    Farmbot.Logger.debug(3, "wireless network config: ssid: #{config.ssid}")
     opts = [ssid: config.ssid, key_mgmt: config.security]
     case config.security do
       "WPA-PSK" ->
@@ -147,13 +145,13 @@ defmodule Farmbot.Target.Network do
     worker(NetworkManager, [interface, opts])
   end
 
-  def start_link(_, opts) do
-    Supervisor.start_link(__MODULE__, [], opts)
+  def start_link(args) do
+    Supervisor.start_link(__MODULE__, args, name: __MODULE__)
   end
 
   def init([]) do
-    config = ConfigStorage.get_all_network_configs()
-    Logger.info(3, "Starting Networking")
+    config = get_all_network_configs()
+    Farmbot.Logger.info(3, "Starting Networking")
     children = config
       |> Enum.map(&to_network_config/1)
       |> Enum.map(&to_child_spec/1)

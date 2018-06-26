@@ -4,10 +4,10 @@ defmodule Farmbot.Target.Bootstrap.Configurator do
   If it can't find a configuration it will bring up a captive portal for a device to connect to.
   """
 
-  @behaviour Farmbot.System.Init
   use Supervisor
   require Farmbot.Logger
-  alias Farmbot.System.ConfigStorage
+  alias Farmbot.Config
+  import Config, only: [get_config_value: 3, update_config_value: 4]
   alias Farmbot.Target.Bootstrap.Configurator
 
   @doc """
@@ -44,7 +44,7 @@ defmodule Farmbot.Target.Bootstrap.Configurator do
   end
 
   def init(_) do
-    first_boot? = ConfigStorage.get_config_value(:bool, "settings", "first_boot")
+    first_boot? = get_config_value(:bool, "settings", "first_boot")
     autoconfigure? = Nerves.Runtime.KV.get("farmbot_auto_configure") |> case do
       "" -> false
       other when is_binary(other) -> true
@@ -68,8 +68,7 @@ defmodule Farmbot.Target.Bootstrap.Configurator do
     Farmbot.Logger.info(3, "Building new configuration.")
     import Supervisor.Spec
     :ets.new(:session, [:named_table, :public, read_concurrency: true])
-    Farmbot.System.GPIO.Leds.led_status_err()
-    ConfigStorage.destroy_all_network_configs()
+    Config.destroy_all_network_configs()
     children = [
       worker(Configurator.CaptivePortal, [], restart: :transient),
       {Plug.Adapters.Cowboy, scheme: :http, plug: Configurator.Router, options: [port: 80, acceptors: 1]}
@@ -86,7 +85,7 @@ defmodule Farmbot.Target.Bootstrap.Configurator do
     email    = Nerves.Runtime.KV.get("farmbot_email")
     server   = Nerves.Runtime.KV.get("farmbot_server")
     password = Nerves.Runtime.KV.get("farmbot_password")
-    ConfigStorage.input_network_config!(%{
+    Config.input_network_config!(%{
       name: ifname,
       ssid: ssid,
       security: "WPA-PSK", psk: psk,
@@ -99,10 +98,10 @@ defmodule Farmbot.Target.Bootstrap.Configurator do
       ipv4_subnet_mask: nil
     })
 
-    ConfigStorage.update_config_value(:string, "authorization", "email", email)
-    ConfigStorage.update_config_value(:string, "authorization", "password", password)
-    ConfigStorage.update_config_value(:string, "authorization", "server", server)
-    ConfigStorage.update_config_value(:string, "authorization", "token", nil)
+    update_config_value(:string, "authorization", "email", email)
+    update_config_value(:string, "authorization", "password", password)
+    update_config_value(:string, "authorization", "server", server)
+    update_config_value(:string, "authorization", "token", nil)
     :ignore
   end
 end

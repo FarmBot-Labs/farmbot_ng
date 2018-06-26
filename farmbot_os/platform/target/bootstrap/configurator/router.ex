@@ -22,7 +22,8 @@ defmodule Farmbot.Target.Bootstrap.Configurator.Router do
   end
 
   @version Farmbot.Project.version()
-  @data_path Application.get_env(:farmbot, :data_path)
+  @data_path Application.get_env(:farmbot_ext, :data_path)
+  @data_path || Mix.raise("No data path")
 
   get "/" do
     last_reset_reason_file = Path.join(@data_path, "last_shutdown_reason")
@@ -231,7 +232,7 @@ defmodule Farmbot.Target.Bootstrap.Configurator.Router do
   end
 
   defp template_file(file) do
-    "#{:code.priv_dir(:farmbot)}/static/templates/#{file}.html.eex"
+    "#{:code.priv_dir(:farmbot_os)}/static/templates/#{file}.html.eex"
   end
 
   defp remove_empty_string(""), do: nil

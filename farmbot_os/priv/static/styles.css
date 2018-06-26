@@ -1,0 +1,340 @@
+* {
+  font-family: "Arial";
+}
+
+body {
+  background: linear-gradient(-135deg, #6db1ec, #35a274);
+  padding: 0.5rem;
+  padding-top: 1rem;
+}
+
+h1, h2 {
+  text-shadow: 0 0 25px rgba(0, 0, 0, 0.1), 0 0 25px rgba(0, 0, 0, 0.1);
+  margin-bottom: 3rem;
+  font-weight: 100;
+  text-align: center;
+  color: #fff;
+}
+
+.button {
+  text-align: center;
+  margin-top: 3rem;
+}
+
+.no-pad {
+  margin: 0;
+  padding: 0;
+}
+
+.gray {
+  display: inline-block;
+  cursor: pointer;
+  background-color: #666;
+  color: #f4f4f4;
+  border-bottom: solid #000;
+}
+
+.gray:hover {
+  background-color: #434343;
+}
+
+a, input[type=submit] {
+  padding: .5rem 1.6rem;
+  font-size: 1.2rem;
+  text-transform: uppercase;
+  text-decoration: none;
+  font-weight: 700!important;
+  border: none;
+  border-radius: 3px;
+  background-color: #6a4;
+  color: #f4f4f4;
+  border-bottom: solid #371;
+  cursor: pointer;
+}
+
+a:hover, input[type=submit]:hover {
+  border-bottom-width: 1px !important;
+  background-color:#61a241;
+}
+
+.widget {
+  margin-bottom: 3rem;
+  position: relative;
+  margin: auto;
+  max-width: 500px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.widget-header {
+  background: #434343;
+  letter-spacing: .05rem;
+  padding: .75rem 1rem;
+}
+
+h5 {
+  color: #cccccc;
+  font-size: 1rem;
+  margin: .25rem;
+  text-transform: uppercase;
+  display: inline;
+  margin-right: 1rem;
+}
+
+p {
+  font-size: 1rem;
+  font-style: italic;
+  margin-top: 0;
+}
+
+.widget-content {
+  background: #f4f4f4;
+  border-color: #ddd;
+  color: #434343 !important;
+  padding: 1rem;
+}
+.widget-content:label {
+  font-size: 1.3rem;
+}
+
+fieldset {
+  border: none;
+  padding: 0;
+}
+
+select {
+  border-radius: 0 !important;
+  font-size: 1.2rem !important;
+  background-color: white !important;
+  color: #434343 !important;
+  height: 30px !important;
+  width: 100% !important;
+  border: 0 !important;
+  box-shadow: 0px 0px 10px #cccccc !important;
+  padding: 0 0.5rem;
+  outline: none;
+}
+
+label {
+  text-transform: uppercase;
+  font-weight: bold;
+  display: block;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+input[type=email],
+input[type=password],
+input[type=text] {
+  border: none;
+  box-shadow: 0px 0px 10px #cccccc !important;
+  padding: 0.5rem;
+  width: 100%;
+  font-size: 1rem;
+}
+
+input[type=email]:focus,
+input[type=password]:focus,
+input[type=text]:focus {
+  outline: none;
+}
+
+input[type="radio"] {
+  display: none;
+  border-radius: 0;
+  -webkit-appearance: none;
+  border: 1px solid black;
+  padding: 1rem 1rem;
+  background: white;
+  outline: none !important;
+  position: relative;
+  cursor: pointer;
+}
+
+input[type="radio"]:checked:after {
+  content: '';
+  position: absolute;
+  width: 0.5rem;
+  height: 1.5rem;
+  border: solid #000;
+  border-width: 0 5px 5px 0;
+  transform: rotate(45deg);
+  top: 0;
+  left: 0.6rem;
+}
+
+.connection-type-form {
+  text-align: center;
+}
+
+.connection-type {
+  display: inline-block;
+  padding: 0.5rem;
+  cursor: pointer;
+  width: 9rem;
+}
+
+.connection-type-box {
+  background: white;
+  border: 2px solid #434343;
+  border-radius: 0.5rem;
+  width: 9rem;
+  height: 9rem;
+  text-align: center;
+}
+
+.connection-type-box > img {
+  width: 7rem;
+  height: 7rem;
+}
+
+.connection-type-box > span {
+  display: inline-block;
+  padding-top: 0.5rem;
+}
+
+.connection-type-box:hover {
+  background: #ccc;
+}
+
+.connection-type-info {
+  margin-top: 0.25rem;
+  float: left;
+  border: 1px solid #ccc;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  text-transform: none;
+  font-weight: bold;
+  font-style: italic;
+  font-size: 0.9rem;
+  color: #ccc;
+}
+
+.connection-type-info-content {
+  padding-top: 0.25rem;
+  opacity: 0;
+  overflow: hidden;
+  text-transform: none;
+  font-weight: normal;
+  margin: 0;
+  font-size: 0.6rem;
+  transition: all 0.5s ease;
+}
+
+.connection-type-info-content p {
+  font-size: 0.75rem;
+}
+
+.connection-type-info-content h4 {
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.connection-type-info:hover {
+  border-color: #434343;
+  color: #434343;
+}
+
+.connection-type-info:hover + .connection-type-info-content {
+  transition: all 0.5s ease 0.2s;
+  opacity: 1;
+}
+
+input:checked + .connection-type-box {
+  background: #ccc;
+  border-width: 3px;
+}
+
+input:checked + .connection-type-box > span {
+  color: black;
+}
+
+input:checked + .connection-type-box > img {
+  filter: brightness(0.25);
+}
+
+table {
+  background: #f4f4f4;
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 1.1rem;
+}
+
+th {
+  text-align: start;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+.table-header {
+  background: #f4f4f4;
+  color: #434343;
+  font-size: 0.75rem;
+}
+
+.ssid_result {
+  line-height: 1.5rem;
+  cursor: pointer;
+}
+
+.ssid_result:hover {
+  background: #ccc;
+  color: black;
+}
+
+.ssid_name {
+  word-break: break-word;
+}
+
+.selected {
+  background-color: #ccc;
+  font-weight: bold;
+}
+
+.ssid_security img {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.customSsidInput {
+  display: inline-block;
+  cursor: pointer;
+  margin-top: 2rem;
+}
+
+.centered {
+  text-align: center;
+}
+
+.expandable {
+  cursor: pointer;
+}
+
+.expandable:after {
+  content: "";
+  margin-left: 0.5rem;
+  display: inline-block;
+  border: 7px solid transparent;
+  border-top: 7px solid #434343;
+  transform: translateY(30%);
+}
+
+.eye-icon {
+  cursor: pointer;
+  width: 2rem;
+  height: 2rem;
+  position: absolute;
+  right: 0.5rem;
+  top: 0;
+}
+
+.psk-input-group {
+  position: relative;
+}
+
+.percent-bar {
+  width: 1%;
+  height: 1.5rem;
+  background-color: #4CAF50;
+}

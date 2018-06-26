@@ -3,6 +3,7 @@ defmodule Farmbot.Target.UpdateHandler do
 
   @behaviour Farmbot.System.UpdateHandler
   require Farmbot.Logger
+  import Farmbot.Config, only: [get_config_value: 3]
 
   # Update Handler callbacks
 
@@ -39,8 +40,8 @@ defmodule Farmbot.Target.UpdateHandler do
 
   def post_update do
     alias Farmbot.Firmware.UartHandler.Update
-    hw = Farmbot.System.ConfigStorage.get_config_value(:string, "settings", "firmware_hardware")
-    is_beta? = Farmbot.System.ConfigStorage.get_config_value(:bool, "settings", "currently_on_beta")
+    hw = get_config_value(:string, "settings", "firmware_hardware")
+    is_beta? = get_config_value(:bool, "settings", "currently_on_beta")
     if is_beta? do
       Farmbot.Logger.debug 1, "Forcing beta image arduino firmware flash."
       Update.force_update_firmware(hw)

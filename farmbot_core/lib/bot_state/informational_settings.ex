@@ -5,13 +5,14 @@ defmodule Farmbot.BotState.InformationalSettings do
     target: target(),
     env: env(),
     node_name: node(),
+    controller_version: version(),
     firmware_commit: arduino_commit(),
     commit: commit(),
+    soc_temp: nil,
     firmware_version: nil,
     sync_status: nil,
     locked: nil,
     last_status: nil,
-    controller_version: version(),
     cache_bust: nil,
     busy: nil
   ]
