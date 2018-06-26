@@ -9,10 +9,6 @@ Restructure of FarmbotOS to fix network and log errors.
    * HTTP Endpoint
    * unix domain socket?
    * lua?
-* Networking
-   * Configurator
-   * NTP
-   * Setting node name is broken.
 * Easter Eggs
 * Most things from the original init system.
 * CI
@@ -39,6 +35,10 @@ Restructure of FarmbotOS to fix network and log errors.
 * http client -> `farmbot_ext`
 * auto sync messages -> `farmbot_ext`
 * OTA Updates - `farmbot_os`
+* Networking - `farmbot_os` (will need to be revisited.)
+   * Configurator
+   * NTP
+   * Setting node name is broken.
 * System things -> `farmbot_os`
   * reboot/poweroff etc
   * factory reset
