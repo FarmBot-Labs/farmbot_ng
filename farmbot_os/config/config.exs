@@ -45,7 +45,8 @@ config :ssl, protocol_version: :"tlsv1.2"
 config :tzdata, :autoupdate, :disabled
 
 config :farmbot_core, :behaviour,
-  firmware_handler: Farmbot.Firmware.StubHandler
+  firmware_handler: Farmbot.Firmware.StubHandler,
+  celery_scheduler: Farmbot.CeleryScript.StubScheduler
 
 config :farmbot_core,
   expected_fw_versions: ["6.4.0.F", "6.4.0.R", "6.4.0.G"],

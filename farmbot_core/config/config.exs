@@ -2,7 +2,8 @@ use Mix.Config
 
 # Configure Farmbot Behaviours.
 config :farmbot_core, :behaviour,
-  firmware_handler: Farmbot.Firmware.StubHandler
+  firmware_handler: Farmbot.Firmware.StubHandler,
+  celery_scheduler: Farmbot.CeleryScript.StubScheduler
 
 config :farmbot_core,
   ecto_repos: [Farmbot.Config.Repo, Farmbot.Logger.Repo, Farmbot.Asset.Repo],

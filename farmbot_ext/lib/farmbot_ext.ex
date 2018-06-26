@@ -13,7 +13,7 @@ defmodule Farmbot.Ext do
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: Farmbot.Ext.Supervisor]
+    opts = [strategy: :one_for_one, name: __MODULE__]
     Supervisor.start_link(children, opts)
   end
 end

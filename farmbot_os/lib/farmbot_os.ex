@@ -14,7 +14,7 @@ defmodule Farmbot.OS do
       {Farmbot.System.UpdateTimer, []},
       {Farmbot.System.ExtStart, []},
     ]
-    opts = [strategy: :one_for_one, name: Farmbot.OS.Supervisor]
+    opts = [strategy: :one_for_one, name: __MODULE__]
     Supervisor.start_link(children, opts)
   end
 end
