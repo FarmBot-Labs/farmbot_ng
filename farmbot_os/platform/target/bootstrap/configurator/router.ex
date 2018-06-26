@@ -24,7 +24,7 @@ defmodule Farmbot.Target.Bootstrap.Configurator.Router do
   @version Farmbot.Project.version()
 
   get "/" do
-    case Farmbot.System.last_reset_reason do
+    case Farmbot.System.last_shutdown_reason() do
       reason when is_binary(reason) ->
         if String.contains?(reason, "CeleryScript request.") do
           render_page(conn, "index", [version: @version, last_reset_reason: nil])
