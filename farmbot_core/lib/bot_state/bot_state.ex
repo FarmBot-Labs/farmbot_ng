@@ -17,10 +17,54 @@ defmodule Farmbot.BotState do
     pins: %{},
     process_info: %{farmwares: %{}},
     gpio_registry: %{},
-    user_env: %{jobs: %{}}
+    user_env: %{},
+    jobs: %{}
   ]
 
   use GenStage
+
+  def download_progress_fun(name) do
+    alias Farmbot.BotState.JobProgress
+    require Farmbot.Logger
+    fn(bytes, total) ->
+      {do_send, prog} = cond do
+        # if the total is complete spit out the bytes,
+        # and put a status of complete.
+        total == :complete ->
+          Farmbot.Logger.success 3, "#{name} complete."
+          {true, %JobProgress.Bytes{bytes: bytes, status: :complete}}
+
+        # if we don't know the total just spit out the bytes.
+        total == nil ->
+          # debug_log "#{name} - #{bytes} bytes."
+          {rem(bytes, 10) == 0, %JobProgress.Bytes{bytes: bytes}}
+        # if the number of bytes == the total bytes,
+        # percentage side is complete.
+        (div(bytes, total)) == 1 ->
+          Farmbot.Logger.success 3, "#{name} complete."
+          {true, %JobProgress.Percent{percent: 100, status: :complete}}
+        # anything else is a percent.
+        true ->
+          percent = ((bytes / total) * 100) |> round()
+          # Logger.busy 3, "#{name} - #{bytes}/#{total} = #{percent}%"
+          {rem(percent, 10) == 0, %JobProgress.Percent{percent: percent}}
+      end
+      if do_send do
+        Farmbot.BotState.set_job_progress(name, prog)
+      else
+        :ok
+      end
+    end
+  end
+
+  @doc "Set job progress."
+  def set_job_progress(name, progress) do
+    GenServer.call(__MODULE__, {:set_job_progress, name, progress})
+  end
+
+  def clear_progress_fun(name) do
+    GenServer.call(__MODULE__, {:clear_progress_fun, name})
+  end
 
   @doc "Fetch the current state."
   def fetch do
@@ -48,6 +92,22 @@ defmodule Farmbot.BotState do
   @doc false
   def handle_call(:fetch, _from, state) do
     {:reply, state, [], state}
+  end
+
+  # TODO(Connor) - Fix this to use event system.
+  def handle_call({:set_job_progress, name, progress}, _from, state) do
+    jobs = Map.put(state.jobs, name, progress)
+    new_state = %{state | jobs: jobs}
+    Farmbot.Registry.dispatch(__MODULE__, new_state)
+    {:reply, :ok, [], new_state}
+  end
+
+  # TODO(Connor) - Fix this to use event system.
+  def handle_call({:clear_progress_fun, name}, _from, state) do
+    jobs = Map.delete(state.jobs, name)
+    new_state = %{state | jobs: jobs}
+    Farmbot.Registry.dispatch(__MODULE__, new_state)
+    {:reply, :ok, [], new_state}
   end
 
   def handle_call({:report_soc_temp, temp}, _form, state) do
@@ -88,7 +148,6 @@ defmodule Farmbot.BotState do
     Farmbot.Registry.dispatch(__MODULE__, new_state)
     {:noreply, [], new_state}
   end
-
 
   @doc false
   def handle_events(events, _from, state) do
