@@ -10,10 +10,9 @@ defmodule Farmbot.OS do
       {Farmbot.System.Init.FSCheckup, []},
       {Farmbot.System.Init.Ecto, []},
       {Farmbot.System.CoreStart, []},
-      {Farmbot.Target.Bootstrap.Configurator, []},
-      {Farmbot.Target.Network, []},
-      {Farmbot.Target.Network.WaitForTime, []},
-      {Farmbot.System.ExtStart, []}
+      {Farmbot.Platform.Supervisor, []},
+      {Farmbot.System.UpdateTimer, []},
+      {Farmbot.System.ExtStart, []},
     ]
     opts = [strategy: :one_for_one, name: Farmbot.OS.Supervisor]
     Supervisor.start_link(children, opts)

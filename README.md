@@ -15,8 +15,13 @@ Restructure of FarmbotOS to fix network and log errors.
 * OTA Updates
 * Most things from the original init system.
 * CI
+* System things
+  * reboot/poweroff etc
+  * factory reset
 * Error handling.
    * Avoid factory resetting at all costs
+   * Where to put factory reset code? `farmbot_os` i guess?
+   * how to handle lower deps crashing?
 
 # Things that have been migrated
 * asset storage -> `farmbot_core`

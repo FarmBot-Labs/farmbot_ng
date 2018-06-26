@@ -41,11 +41,7 @@ defmodule Farmbot.OS.MixProject do
   defp deps do
     [
       {:nerves, "~> 1.0", runtime: false},
-      {:nerves_firmware, "~> 0.4.0"},
       {:shoehorn, "~> 0.2"},
-
-      {:dhcp_server, "~> 0.4.0"},
-      {:mdns, "~> 1.0"},
 
       {:cowboy, "~> 1.0.0"},
       {:plug, "~> 1.0"},
@@ -63,7 +59,11 @@ defmodule Farmbot.OS.MixProject do
   defp deps(target) do
     [
       {:nerves_runtime, "~> 0.4"},
-      {:nerves_network, "~> 0.3.6"}
+      {:nerves_network, "~> 0.3.6"},
+      {:nerves_firmware, "~> 0.4.0"},
+      {:dhcp_server, "~> 0.4.0"},
+      {:mdns, "~> 1.0"},
+      {:nerves_init_gadget, "~> 0.4.0", only: :dev}
     ] ++ system(target)
   end
 

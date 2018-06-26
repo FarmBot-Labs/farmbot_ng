@@ -5,6 +5,16 @@
 # is restricted to this project.
 use Mix.Config
 
+# Mix configs.
+target = Mix.Project.config()[:target]
+env = Mix.env()
+
+config :logger, [
+  utc_log: true,
+  # handle_otp_reports: true,
+  # handle_sasl_reports: true,
+]
+
 # Customize non-Elixir parts of the firmware.  See
 # https://hexdocs.pm/nerves/advanced-configuration.html for details.
 config :nerves, :firmware, rootfs_overlay: "rootfs_overlay"
@@ -13,7 +23,7 @@ config :nerves, :firmware, rootfs_overlay: "rootfs_overlay"
 # docs for separating out critical OTP applications such as those
 # involved with firmware updates.
 config :shoehorn,
-  init: [:nerves_runtime],
+  init: [:nerves_runtime, :nerves_init_gadget],
   app: Mix.Project.config()[:app]
 
 # Stop lager redirecting :error_logger messages
@@ -44,33 +54,20 @@ config :farmbot_core,
   firmware_io_logs: false,
   farm_event_debug_log: false
 
-
-config :farmbot_core, Farmbot.Config.Repo,
-  adapter: Sqlite.Ecto2,
-  loggers: [],
-  database: "/tmp/#{Mix.env}_configs.sqlite3",
-  pool_size: 1
-
-config :farmbot_core, Farmbot.Logger.Repo,
-  adapter: Sqlite.Ecto2,
-  loggers: [],
-  database: "/tmp/#{Mix.env}_logs.sqlite3",
-  pool_size: 1
-
-config :farmbot_core, Farmbot.Asset.Repo,
-  adapter: Sqlite.Ecto2,
-  loggers: [],
-  database: "/tmp/#{Mix.env}_assets.sqlite3",
-  pool_size: 1
-
 config :farmbot_ext, :behaviour,
   authorization: Farmbot.Bootstrap.Authorization,
   http_adapter:  Farmbot.HTTP.HTTPoisonAdapter,
   json_parser:   Farmbot.JSON.JasonParser
 
-config :farmbot_ext,
-  data_path: "/tmp"
-
 config :farmbot_os,
-  ecto_repos: [Farmbot.Config.Repo, Farmbot.Logger.Repo, Farmbot.Asset.Repo],
-  captive_portal_address: "192.168.24.1"
+  ecto_repos: [Farmbot.Config.Repo, Farmbot.Logger.Repo, Farmbot.Asset.Repo]
+
+case target do
+  "host" ->
+    import_config("host/#{env}.exs")
+
+  _ ->
+    import_config("target/#{env}.exs")
+    if File.exists?("config/target/#{target}.exs"),
+      do: import_config("target/#{target}.exs")
+end

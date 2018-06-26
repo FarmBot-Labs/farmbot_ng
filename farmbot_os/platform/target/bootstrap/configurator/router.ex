@@ -22,19 +22,16 @@ defmodule Farmbot.Target.Bootstrap.Configurator.Router do
   end
 
   @version Farmbot.Project.version()
-  @data_path Application.get_env(:farmbot_ext, :data_path)
-  @data_path || Mix.raise("No data path")
 
   get "/" do
-    last_reset_reason_file = Path.join(@data_path, "last_shutdown_reason")
-    case File.read(last_reset_reason_file) do
-      {:ok, reason} when is_binary(reason) ->
+    case Farmbot.System.last_reset_reason do
+      reason when is_binary(reason) ->
         if String.contains?(reason, "CeleryScript request.") do
           render_page(conn, "index", [version: @version, last_reset_reason: nil])
         else
           render_page(conn, "index", [version: @version, last_reset_reason: Phoenix.HTML.raw(reason)])
         end
-      {:error, _} ->
+      _ ->
         render_page(conn, "index", [version: @version, last_reset_reason: nil])
     end
   end
@@ -134,11 +131,10 @@ defmodule Farmbot.Target.Bootstrap.Configurator.Router do
 
   get "/credentials" do
     email = get_config_value(:string, "authorization", "email") || ""
-    pass = get_config_value(:string, "authorization", "password") || ""
     server = get_config_value(:string, "authorization", "server") || ""
     first_boot = get_config_value(:bool, "settings", "first_boot")
     update_config_value(:string, "authorization", "token", nil)
-    render_page(conn, "credentials", server: server, email: email, password: pass, first_boot: first_boot)
+    render_page(conn, "credentials", server: server, email: email, password: "", first_boot: first_boot)
   end
 
   get "/firmware" do

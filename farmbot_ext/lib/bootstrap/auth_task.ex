@@ -64,7 +64,7 @@ defmodule Farmbot.Bootstrap.AuthTask do
 
   defp restart_transports do
     bootstrap_sup = Farmbot.Bootstrap.Supervisor
-    transport_sup = Farmbot.BotState.Transport.Supervisor
+    transport_sup = Farmbot.AMQP.Supervisor
     :ok = Supervisor.terminate_child(bootstrap_sup, transport_sup)
     {:ok, _} = Supervisor.restart_child(bootstrap_sup, transport_sup)
   end
