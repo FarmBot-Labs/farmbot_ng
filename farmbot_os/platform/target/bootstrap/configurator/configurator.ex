@@ -6,7 +6,7 @@ defmodule Farmbot.Target.Bootstrap.Configurator do
 
   @behaviour Farmbot.System.Init
   use Supervisor
-  use Farmbot.Logger
+  require Farmbot.Logger
   alias Farmbot.System.ConfigStorage
   alias Farmbot.Target.Bootstrap.Configurator
 
@@ -22,7 +22,7 @@ defmodule Farmbot.Target.Bootstrap.Configurator do
   reset and the user will need to configureate again.
   """
   def start_link(_) do
-    Logger.busy(3, "Configuring Farmbot.")
+    Farmbot.Logger.busy(3, "Configuring Farmbot.")
     supervisor = Supervisor.start_link(__MODULE__, [self()], [name: __MODULE__])
 
     case supervisor do
@@ -65,7 +65,7 @@ defmodule Farmbot.Target.Bootstrap.Configurator do
   end
 
   defp maybe_configurate(false) do
-    Logger.info(3, "Building new configuration.")
+    Farmbot.Logger.info(3, "Building new configuration.")
     import Supervisor.Spec
     :ets.new(:session, [:named_table, :public, read_concurrency: true])
     Farmbot.System.GPIO.Leds.led_status_err()

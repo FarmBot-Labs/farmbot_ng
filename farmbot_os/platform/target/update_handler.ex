@@ -2,7 +2,7 @@ defmodule Farmbot.Target.UpdateHandler do
   @moduledoc "Handles prep and post OTA update."
 
   @behaviour Farmbot.System.UpdateHandler
-  use Farmbot.Logger
+  require Farmbot.Logger
 
   # Update Handler callbacks
 
@@ -32,7 +32,7 @@ defmodule Farmbot.Target.UpdateHandler do
     #{product}
     #{version}
     """
-    Logger.debug 1, msg
+    Farmbot.Logger.debug 1, msg
   end
 
   def before_update, do: :ok
@@ -42,7 +42,7 @@ defmodule Farmbot.Target.UpdateHandler do
     hw = Farmbot.System.ConfigStorage.get_config_value(:string, "settings", "firmware_hardware")
     is_beta? = Farmbot.System.ConfigStorage.get_config_value(:bool, "settings", "currently_on_beta")
     if is_beta? do
-      Logger.debug 1, "Forcing beta image arduino firmware flash."
+      Farmbot.Logger.debug 1, "Forcing beta image arduino firmware flash."
       Update.force_update_firmware(hw)
     else
       Update.maybe_update_firmware(hw)

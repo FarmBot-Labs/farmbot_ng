@@ -12,8 +12,8 @@ defmodule Farmbot.System.Init.FSCheckup do
   @env Farmbot.Project.env()
 
   @doc false
-  def start_link(_, opts \\ []) do
-    Supervisor.start_link(__MODULE__, [], opts)
+  def start_link(args) do
+    Supervisor.start_link(__MODULE__, args, name: __MODULE__)
   end
 
   @doc false

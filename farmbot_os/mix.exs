@@ -16,6 +16,7 @@ defmodule Farmbot.OS.MixProject do
       lockfile: "mix.lock.#{@target}",
       start_permanent: Mix.env() == :prod,
       aliases: [loadconfig: [&bootstrap/1]],
+      elixirc_paths: elixirc_paths(Mix.env(), @target),
       deps: deps()
     ]
   end
@@ -41,6 +42,10 @@ defmodule Farmbot.OS.MixProject do
     [
       {:nerves, "~> 1.0", runtime: false},
       {:shoehorn, "~> 0.2"},
+      {:cowboy, "~> 1.0.0"},
+      {:plug, "~> 1.0"},
+      {:cors_plug, "~> 1.5"},
+
       {:farmbot_core, path: "../farmbot_core", env: Mix.env()},
       {:farmbot_ext, path: "../farmbot_ext", env: Mix.env()}
     ] ++ deps(@target)
@@ -54,6 +59,18 @@ defmodule Farmbot.OS.MixProject do
       {:nerves_runtime, "~> 0.4"},
       {:nerves_network, "~> 0.3.6"}
     ] ++ system(target)
+  end
+
+  defp elixirc_paths(:test, "host") do
+    ["./lib", "./platform/host", "./test/support"]
+  end
+
+  defp elixirc_paths(_, "host") do
+    ["./lib", "./platform/host"]
+  end
+
+  defp elixirc_paths(_env, _target) do
+    ["./lib", "./platform/target"]
   end
 
   defp system("rpi3"), do: [{:nerves_system_farmbot_rpi3, "~> 1.1.1-farmbot.0", runtime: false}]

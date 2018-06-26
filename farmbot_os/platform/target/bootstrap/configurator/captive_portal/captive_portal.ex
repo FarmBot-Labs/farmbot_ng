@@ -1,6 +1,6 @@
 defmodule Farmbot.Target.Bootstrap.Configurator.CaptivePortal do
   use GenServer
-  use Farmbot.Logger
+  require Farmbot.Logger
 
   @interface Application.get_env(:farmbot, :captive_portal_interface, "wlan0")
   @address Application.get_env(:farmbot, :captive_portal_address, "192.168.25.1")
@@ -13,7 +13,7 @@ defmodule Farmbot.Target.Bootstrap.Configurator.CaptivePortal do
   end
 
   def init([]) do
-    Logger.busy(3, "Starting captive portal.")
+    Farmbot.Logger.busy(3, "Starting captive portal.")
     ensure_interface(@interface)
 
     Nerves.Network.teardown(@interface)
@@ -56,9 +56,9 @@ defmodule Farmbot.Target.Bootstrap.Configurator.CaptivePortal do
   end
 
   def terminate(_, state) do
-    Logger.busy 3, "Stopping captive portal GenServer."
+    Farmbot.Logger.busy 3, "Stopping captive portal GenServer."
 
-    Logger.busy 3, "Stopping DHCP GenServer."
+    Farmbot.Logger.busy 3, "Stopping DHCP GenServer."
     GenServer.stop(state.dhcp_server, :normal)
 
     stop_dnsmasq(state)
@@ -72,7 +72,7 @@ defmodule Farmbot.Target.Bootstrap.Configurator.CaptivePortal do
     case Nerves.NetworkInterface.status(interface) do
       {:ok, %{operstate: :down}} -> :ok
       {:ok, %{operstate: :up}} ->
-        Logger.busy 3, "Trying to stop #{interface}."
+        Farmbot.Logger.busy 3, "Trying to stop #{interface}."
         Process.sleep(1000)
         Nerves.NetworkInterface.ifdown(interface)
         do_teardown(interface)
@@ -95,7 +95,7 @@ defmodule Farmbot.Target.Bootstrap.Configurator.CaptivePortal do
 
   defp ensure_interface(interface) do
     unless interface in Nerves.NetworkInterface.interfaces() do
-      Logger.debug 2, "Waiting for #{interface}: #{inspect Nerves.NetworkInterface.interfaces()}"
+      Farmbot.Logger.debug 2, "Waiting for #{interface}: #{inspect Nerves.NetworkInterface.interfaces()}"
       Process.sleep(100)
       ensure_interface(interface)
     end
@@ -134,19 +134,19 @@ defmodule Farmbot.Target.Bootstrap.Configurator.CaptivePortal do
   defp stop_dnsmasq(state) do
     case state.dnsmasq do
       {dnsmasq_port, dnsmasq_os_pid} ->
-        Logger.busy 3, "Stopping dnsmasq"
-        Logger.busy 3, "Killing dnsmasq PID."
+        Farmbot.Logger.busy 3, "Stopping dnsmasq"
+        Farmbot.Logger.busy 3, "Killing dnsmasq PID."
         :ok = kill(dnsmasq_os_pid)
         Port.close(dnsmasq_port)
-        Logger.success 3, "Stopped dnsmasq."
+        Farmbot.Logger.success 3, "Stopped dnsmasq."
         :ok
       _ ->
-        Logger.debug 3, "Dnsmasq not running."
+        Farmbot.Logger.debug 3, "Dnsmasq not running."
         :ok
     end
   rescue
     e ->
-      Logger.error 3, "Error stopping dnsmasq: #{Exception.message(e)}"
+      Farmbot.Logger.error 3, "Error stopping dnsmasq: #{Exception.message(e)}"
       :ok
   end
 
@@ -161,7 +161,7 @@ defmodule Farmbot.Target.Bootstrap.Configurator.CaptivePortal do
   defp print_cmd({_, 0}), do: :ok
 
   defp print_cmd({_, num}) do
-    Logger.error(2, "Encountered an error (#{num})")
+    Farmbot.Logger.error(2, "Encountered an error (#{num})")
     :error
   end
 

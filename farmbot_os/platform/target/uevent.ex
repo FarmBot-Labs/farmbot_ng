@@ -2,12 +2,12 @@ defmodule Farmbot.Target.Uevent.Supervisor do
   @moduledoc false
   use Supervisor
 
-  def start_link(_,_) do
-    Supervisor.start_link(__MODULE__, [], [name: __MODULE__])
+  def start_link(args) do
+    Supervisor.start_link(__MODULE__, args, [name: __MODULE__])
   end
 
   def init([]) do
-    children = [worker(Farmbot.Target.Uevent, [])]
+    children = [{Farmbot.Target.Uevent, []}]
     supervise(children, [strategy: :one_for_one])
   end
 end
@@ -16,10 +16,10 @@ defmodule Farmbot.Target.Uevent do
   @moduledoc false
 
   use GenServer
-  use Farmbot.Logger
+  require Farmbot.Logger
 
-  def start_link do
-    GenServer.start_link(__MODULE__, [], [name: __MODULE__])
+  def start_link(args) do
+    GenServer.start_link(__MODULE__, args, [name: __MODULE__])
   end
 
   def init([]) do
@@ -55,7 +55,7 @@ defmodule Farmbot.Target.Uevent do
 
   defp handle_uevent(%{"action" => "add", "subsystem" => "tty", "devname" => tty}) do
     if String.contains?(tty, "USB") || String.contains?(tty, "ACM") do
-      Logger.busy 3, "Detected new UART Device: #{tty}"
+      Farmbot.Logger.busy 3, "Detected new UART Device: #{tty}"
       Application.put_env(:farmbot, :uart_handler, tty: "/dev/" <> tty)
       old_env = Application.get_env(:farmbot, :behaviour)
 
@@ -67,7 +67,7 @@ defmodule Farmbot.Target.Uevent do
         end
       end
     else
-      Logger.debug 3, "Ignoring system tty: #{tty}"
+      Farmbot.Logger.debug 3, "Ignoring system tty: #{tty}"
       :ok
     end
   end

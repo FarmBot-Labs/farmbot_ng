@@ -1,4 +1,4 @@
-defmodule Farmbot.System.CoreStart do
+defmodule Farmbot.System.ExtStart do
   @moduledoc false
   use Supervisor
 
@@ -8,7 +8,7 @@ defmodule Farmbot.System.CoreStart do
   end
 
   def init([]) do
-    Application.ensure_all_started(:farmbot_core)
+    Application.ensure_all_started(:farmbot_ext)
     :ignore
   end
 end

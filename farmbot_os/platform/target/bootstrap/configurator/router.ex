@@ -2,17 +2,17 @@ defmodule Farmbot.Target.Bootstrap.Configurator.Router do
   @moduledoc "Routes web connections."
 
   use Plug.Router
-  use Plug.Debugger, otp_app: :farmbot
-  plug(Plug.Static, from: {:farmbot, "priv/static"}, at: "/")
+  use Plug.Debugger, otp_app: :farmbot_os
+  plug(Plug.Static, from: {:farmbot_os, "priv/static"}, at: "/")
   plug(Plug.Logger, log: :debug)
   plug(Plug.Parsers, parsers: [:urlencoded, :multipart])
   plug(:match)
   plug(:dispatch)
 
-  use Farmbot.Logger
+  require Farmbot.Logger
   import Phoenix.HTML
-  alias Farmbot.System.ConfigStorage
-  import ConfigStorage, only: [
+  alias Farmbot.Config
+  import Config, only: [
     get_config_value: 3,
     update_config_value: 4
   ]
@@ -62,7 +62,7 @@ defmodule Farmbot.Target.Bootstrap.Configurator.Router do
       render_page(conn, "config_wired", [ifname: ifname, advanced_network: advanced_network()])
     rescue
       e in MissingField ->
-        Logger.error 1, Exception.message(e)
+        Farmbot.Logger.error 1, Exception.message(e)
         redir(conn, e.redir)
     end
   end
@@ -94,7 +94,7 @@ defmodule Farmbot.Target.Bootstrap.Configurator.Router do
       end
     rescue
       e in MissingField ->
-        Logger.error 1, Exception.message(e)
+        Farmbot.Logger.error 1, Exception.message(e)
         redir(conn, e.redir)
     end
   end
@@ -111,7 +111,7 @@ defmodule Farmbot.Target.Bootstrap.Configurator.Router do
       ipv4_address     = conn.params["ipv4_address"] |> remove_empty_string()
       ipv4_gateway     = conn.params["ipv4_gateway"] |> remove_empty_string()
       ipv4_subnet_mask = conn.params["ipv4_subnet_mask"] |> remove_empty_string()
-      ConfigStorage.input_network_config!(%{
+      Config.input_network_config!(%{
         name: ifname,
         ssid: ssid, security: security, psk: psk,
         type: if(ssid, do: "wireless", else: "wired"),
@@ -125,7 +125,7 @@ defmodule Farmbot.Target.Bootstrap.Configurator.Router do
       redir(conn, "/firmware")
     rescue
       e in MissingField ->
-        Logger.error 1, Exception.message(e)
+        Farmbot.Logger.error 1, Exception.message(e)
         redir(conn, e.redir)
     end
   end
@@ -152,7 +152,7 @@ defmodule Farmbot.Target.Bootstrap.Configurator.Router do
         update_config_value(:string, "settings", "firmware_hardware", hw)
 
         if Application.get_env(:farmbot, :behaviour)[:firmware_handler] == Farmbot.Firmware.UartHandler do
-          Logger.warn 1, "Updating #{hw} firmware."
+          Farmbot.Logger.warn 1, "Updating #{hw} firmware."
           # /shrug?
           Farmbot.Firmware.UartHandler.Update.force_update_firmware(hw)
         end
@@ -188,13 +188,13 @@ defmodule Farmbot.Target.Bootstrap.Configurator.Router do
     email = get_config_value(:string, "authorization", "email")
     pass = get_config_value(:string, "authorization", "password")
     server = get_config_value(:string, "authorization", "server")
-    network = !(Enum.empty?(ConfigStorage.get_all_network_configs()))
+    network = !(Enum.empty?(Config.get_all_network_configs()))
     if email && pass && server && network do
       conn = render_page(conn, "finish")
       spawn fn() ->
         try do
           alias Farmbot.Target.Bootstrap.Configurator
-          Logger.success 2, "Configuration finished."
+          Farmbot.Logger.success 2, "Configuration finished."
           Process.sleep(2500) # Allow the page to render and send.
           :ok = GenServer.stop(Configurator.CaptivePortal, :normal)
           # :ok = Supervisor.terminate_child(Configurator, Configurator.CaptivePortal)
@@ -202,13 +202,13 @@ defmodule Farmbot.Target.Bootstrap.Configurator.Router do
           Process.sleep(2500) # Good luck.
         rescue
           e ->
-            Logger.warn 1, "Falied to close captive portal. Good luck. " <>
+            Farmbot.Logger.warn 1, "Falied to close captive portal. Good luck. " <>
               Exception.message(e)
         end
       end
       conn
     else
-      Logger.warn 3, "Not configured yet. Restarting configuration."
+      Farmbot.Logger.warn 3, "Not configured yet. Restarting configuration."
       redir(conn, "/")
     end
   end
