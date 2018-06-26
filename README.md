@@ -13,13 +13,9 @@ Restructure of FarmbotOS to fix network and log errors.
    * Configurator
    * NTP
    * Setting node name is broken.
-* OTA Updates
 * Easter Eggs
 * Most things from the original init system.
 * CI
-* System things
-  * reboot/poweroff etc
-  * factory reset
 * Error handling.
    * Avoid factory resetting at all costs
    * Where to put factory reset code? `farmbot_os` i guess?
@@ -42,6 +38,10 @@ Restructure of FarmbotOS to fix network and log errors.
 * amqp -> `farmbot_ext`
 * http client -> `farmbot_ext`
 * auto sync messages -> `farmbot_ext`
+* OTA Updates - `farmbot_os`
+* System things -> `farmbot_os`
+  * reboot/poweroff etc
+  * factory reset
 
 # Things i am unsure about
 * CeleryScript - Has both network _and_ core requirements.
