@@ -12,6 +12,7 @@ Restructure of FarmbotOS to fix network and log errors.
 * Networking
    * Configurator
    * NTP
+   * Setting node name is broken.
 * OTA Updates
 * Most things from the original init system.
 * CI

@@ -27,6 +27,11 @@ defmodule Farmbot.BotState do
     GenStage.call(__MODULE__, :fetch)
   end
 
+  @doc "Report SOC Temp."
+  def report_soc_temp(temp) do
+    GenStage.call(__MODULE__, {:report_soc_temp, temp})
+  end
+
   @doc false
   def start_link(args) do
     GenStage.start_link(__MODULE__, args, [name: __MODULE__])
@@ -45,6 +50,13 @@ defmodule Farmbot.BotState do
     {:reply, state, [], state}
   end
 
+  def handle_call({:report_soc_temp, temp}, _form, state) do
+    event = {:informational_settings, %{soc_temp: temp}}
+    new_state = handle_event(event, state)
+    Farmbot.Registry.dispatch(__MODULE__, new_state)
+    {:reply, :ok, [], new_state}
+  end
+
   @doc false
   def handle_info({Farmbot.Registry, {Farmbot.Config, {"settings", key, val}}}, state) do
     event = {:settings, %{String.to_atom(key) => val}}
@@ -52,6 +64,8 @@ defmodule Farmbot.BotState do
     Farmbot.Registry.dispatch(__MODULE__, new_state)
     {:noreply, [], new_state}
   end
+
+  def handle_info({Farmbot.Registry, _}, state), do: {:noreply, [], state}
 
   def handle_info(:get_initial_configuration, state) do
     full_config = Farmbot.Config.get_config_as_map()
@@ -75,7 +89,6 @@ defmodule Farmbot.BotState do
     {:noreply, [], new_state}
   end
 
-  def handle_info({Farmbot.Registry, _}, state), do: {:noreply, [], state}
 
   @doc false
   def handle_events(events, _from, state) do
