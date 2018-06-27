@@ -14,7 +14,7 @@ defmodule Farmbot.Core do
       shutdown: 500
     }
   end
-  
+
   @doc false
   def start(_, args), do: Supervisor.start_link(__MODULE__, args, name: __MODULE__)
 

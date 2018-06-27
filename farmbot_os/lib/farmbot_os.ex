@@ -13,6 +13,7 @@ defmodule Farmbot.OS do
       {Farmbot.Platform.Supervisor, []},
       {Farmbot.System.UpdateTimer, []},
       {Farmbot.System.ExtStart, []},
+      {Farmbot.EasterEggs, [] }
     ]
     opts = [strategy: :one_for_one, name: __MODULE__]
     Supervisor.start_link(children, opts)
