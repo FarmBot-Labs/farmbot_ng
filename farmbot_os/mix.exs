@@ -63,7 +63,8 @@ defmodule Farmbot.OS.MixProject do
       {:nerves_firmware, "~> 0.4.0"},
       {:dhcp_server, "~> 0.4.0"},
       {:mdns, "~> 1.0"},
-      {:nerves_init_gadget, "~> 0.4.0", only: :dev}
+      {:nerves_init_gadget, "~> 0.4.0", only: :dev},
+
     ] ++ system(target)
   end
 
@@ -79,6 +80,6 @@ defmodule Farmbot.OS.MixProject do
     ["./lib", "./platform/target"]
   end
 
-  defp system("rpi3"), do: [{:nerves_system_farmbot_rpi3, "~> 1.1.1-farmbot.0", runtime: false}]
+  defp system("rpi3"), do: [{:nerves_system_farmbot_rpi3, "~> 1.2.1-farmbot.0", runtime: false}]
   defp system(target), do: Mix.raise("Unknown MIX_TARGET: #{target}")
 end

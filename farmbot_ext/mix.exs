@@ -8,6 +8,7 @@ defmodule Farmbot.Ext.MixProject do
       version: @version,
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
+      elixirc_paths: ["lib", "vendor"],
       deps: deps()
     ]
   end
@@ -24,11 +25,12 @@ defmodule Farmbot.Ext.MixProject do
   defp deps do
     [
       {:farmbot_core, path: "../farmbot_core", env: Mix.env()},
+      # TODO(Connor) JUN 20 - Remove me
+      {:ranch_proxy_protocol, github: "heroku/ranch_proxy_protocol", override: true},
       {:httpoison, "~> 1.2"},
       {:jason, "~> 1.0"},
       {:uuid, "~> 1.1"},
       {:amqp, "~> 1.0"},
-      {:rsa, "~> 0.0.1"},
       {:fs, "~> 3.4"},
     ]
   end
