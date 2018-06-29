@@ -16,6 +16,7 @@ defmodule Farmbot.System.Watchdog do
 
   def handle_info({:DOWN, ref, :process, _id, reason}, %{monitor: ref} = state) do
     Logger.error "[#{inspect ref}] Watchdog process caught exit: #{inspect state.pid} #{inspect reason}"
-    {:stop, {state.pid, reason}, state}
+    {:noreply, state}
+    # {:stop, {state.pid, reason}, state}
   end
 end

@@ -77,45 +77,31 @@ defmodule Farmbot.Bootstrap.Supervisor do
     # Make sure we log when amqp is connected.
     update_config_value(:bool, "settings", "log_amqp_connected", true)
 
-    # try to find the creds.
-    case get_creds() do
-      # do the actual supervisor init if we have creds. This may still fail.
-      {email, pass, server} ->
-        actual_init(email, pass, server)
-
-      # This will cause a factory reset.
-      {:error, reason} ->
-        {:error, reason}
+    email    = get_config_value(:string, "authorization", "email")
+    server   = get_config_value(:string, "authorization", "server")
+    password = get_config_value(:string, "authorization", "password")
+    secret   = get_config_value(:string, "authorization", "secret")
+    cond do
+      is_nil(email) -> exit("No email")
+      is_nil(server) -> exit("No server")
+      password ->
+        actual_init(fn(e, pas, s) ->
+          Farmbot.Logger.debug 3, "Using password to authorize."
+          @auth_task.authorize_with_password(e, pas, s)
+        end, email, password, server)
+      secret -> actual_init(fn(e, sec, s) ->
+        Farmbot.Logger.debug 3, "Using secret to authorize."
+        @auth_task.authorize_with_secret(e, sec, s)
+      end, email, password, server)
+      true -> exit("No password or secret.")
     end
   end
 
-  @typedoc "Authorization credentials."
-  @type auth :: {Auth.email(), Auth.password(), Auth.server()}
-
-  @spec get_creds() :: auth | {:error, term}
-  defp get_creds do
-    try do
-      # Fetch email, server, password from Storage.
-      email = get_config_value(:string, "authorization", "email")
-      pass = get_config_value(:string, "authorization", "password")
-      server = get_config_value(:string, "authorization", "server")
-
-      # Make sure they aren't empty.
-      email  || raise "Could not find email in configuration. "
-      pass   || raise "No password provided in config storage."
-      server || raise "No server provided in config storage."
-      {email, pass, server}
-    rescue
-      e in RuntimeError -> {:error, Exception.message(e)}
-      e -> reraise(e, System.stacktrace())
-    end
-  end
-
-  defp actual_init(email, pass, server) do
+  defp actual_init(fun, email, password_or_secret, server) when is_function(fun) do
     busy_msg = "Beginning Bootstrap authorization: #{email} - #{server}"
     Farmbot.Logger.busy(2, busy_msg)
     # get a token
-    case @auth_task.authorize(email, pass, server) do
+    case fun.(email, password_or_secret, server) do
       {:ok, token} ->
         success_msg = "Successful Bootstrap authorization: #{email} - #{server}"
         Farmbot.Logger.success(2, success_msg)
@@ -132,7 +118,7 @@ defmodule Farmbot.Bootstrap.Supervisor do
         opts = [strategy: :one_for_one]
         Supervisor.init(children, opts)
 
-      {:error, reason} -> {:error, reason}
+      {:error, reason} -> exit(reason)
     end
   end
 end
