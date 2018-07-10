@@ -71,9 +71,14 @@ defmodule Farmbot.BotState do
     GenStage.call(__MODULE__, :fetch)
   end
 
-  @doc "Report SOC Temp."
-  def report_soc_temp(temp) do
+  @doc "Report SOC temp."
+  def report_soc_temp(temp) when is_number(temp) do
     GenStage.call(__MODULE__, {:report_soc_temp, temp})
+  end
+
+  @doc "Report WiFi level."
+  def report_wifi_level(level) when is_number(level) do
+    GenStage.call(__MODULE__, {:report_wifi_level, level})
   end
 
   @doc false
@@ -112,6 +117,13 @@ defmodule Farmbot.BotState do
 
   def handle_call({:report_soc_temp, temp}, _form, state) do
     event = {:informational_settings, %{soc_temp: temp}}
+    new_state = handle_event(event, state)
+    Farmbot.Registry.dispatch(__MODULE__, new_state)
+    {:reply, :ok, [], new_state}
+  end
+
+  def handle_call({:report_wifi_level, level}, _form, state) do
+    event = {:informational_settings, %{wifi_level: level}}
     new_state = handle_event(event, state)
     Farmbot.Registry.dispatch(__MODULE__, new_state)
     {:reply, :ok, [], new_state}

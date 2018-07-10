@@ -37,7 +37,11 @@ config :farmbot_core, Farmbot.Asset.Repo,
 
 config :farmbot_os,
   ecto_repos: [Farmbot.Config.Repo, Farmbot.Logger.Repo, Farmbot.Asset.Repo],
-  platform_children: []
+  platform_children: [],
+  system_info_children: [
+    {Farmbot.Platform.SocTempWorker, []},
+    {Farmbot.Platform.Network.InfoSupervisor, []}
+  ]
 
 config :farmbot_os, :behaviour,
   update_handler: Farmbot.Target.UpdateHandler,

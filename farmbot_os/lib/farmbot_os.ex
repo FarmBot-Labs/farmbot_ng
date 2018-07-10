@@ -13,6 +13,7 @@ defmodule Farmbot.OS do
       {Farmbot.Platform.Supervisor, []},
       {Farmbot.System.UpdateTimer, []},
       {Farmbot.System.ExtStart, []},
+      {Farmbot.System.Info.Supervisor, []},
       {Farmbot.EasterEggs, [] }
     ]
     opts = [strategy: :one_for_one, name: __MODULE__]

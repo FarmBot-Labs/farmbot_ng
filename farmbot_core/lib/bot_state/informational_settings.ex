@@ -9,6 +9,7 @@ defmodule Farmbot.BotState.InformationalSettings do
     firmware_commit: arduino_commit(),
     commit: commit(),
     soc_temp: nil,
+    wifi_level: nil,
     firmware_version: nil,
     sync_status: nil,
     locked: nil,
