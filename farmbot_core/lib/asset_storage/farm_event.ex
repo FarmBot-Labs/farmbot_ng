@@ -63,7 +63,7 @@ defmodule Farmbot.Asset.FarmEvent do
   def build_calendar(%__MODULE__{calendar: nil} = fe),
     do: build_calendar(%{fe | calendar: []})
 
-  def build_calendar(%__MODULE__{time_unit: "never"} = fe), do: fe
+  def build_calendar(%__MODULE__{time_unit: "never"} = fe), do: %{fe | calendar: [fe.start_time]}
 
   def build_calendar(%__MODULE__{calendar: calendar} = fe)
       when is_list(calendar) do
