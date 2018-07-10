@@ -14,7 +14,7 @@ Restructure of FarmbotOS to fix network and log errors.
    * Avoid factory resetting at all costs
    * Where to put factory reset code? `farmbot_os` i guess?
    * how to handle lower deps crashing?
-* FBOS Commit: 231673abc8019f265785afe311a2253cc9354c38
+* Pin Bindings
 
 # Things that have been migrated
 * asset storage -> `farmbot_core`
@@ -42,6 +42,9 @@ Restructure of FarmbotOS to fix network and log errors.
 * System things -> `farmbot_os`
   * reboot/poweroff etc
   * factory reset
+* System info -> `farmbot_os`
+  * wifi network level
+  * soc temp
 
 # Things i am unsure about
 * CeleryScript - Has both network _and_ core requirements.
