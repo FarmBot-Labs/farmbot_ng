@@ -24,19 +24,6 @@ defmodule Farmbot.AMQP.CeleryScriptTransport do
     {:ok, struct(State, [conn: conn, chan: chan, bot: jwt.bot])}
   end
 
-  def terminate(reason, state) do
-    ok_reasons = [:normal, :shutdown, :token_refresh]
-    update_config_value(:bool, "settings", "ignore_fbos_config", false)
-
-    if reason not in ok_reasons do
-      Farmbot.Logger.error 1, "Celeryscript amqp client Died: #{inspect reason}"
-      update_config_value(:bool, "settings", "log_amqp_connected", true)
-    end
-
-    # If a channel was still open, close it.
-    if state.chan, do: AMQP.Channel.close(state.chan)
-  end
-
   # Confirmation sent by the broker after registering this process as a consumer
   def handle_info({:basic_consume_ok, _}, state) do
     if get_config_value(:bool, "settings", "log_amqp_connected") do

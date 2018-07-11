@@ -8,15 +8,15 @@ defmodule Farmbot.System.Watchdog do
     GenServer.start_link(__MODULE__, args)
   end
 
-  def init([pid]) do
+  def init([pid, app]) do
     Process.flag(:trap_exit, true)
     ref = Process.monitor(pid)
-    {:ok, %{monitor: ref, pid: pid}}
+    {:ok, %{monitor: ref, pid: pid, app: app}}
   end
 
   def handle_info({:DOWN, ref, :process, _id, reason}, %{monitor: ref} = state) do
     Logger.error "[#{inspect ref}] Watchdog process caught exit: #{inspect state.pid} #{inspect reason}"
+    Application.ensure_all_started(state.app)
     {:noreply, state}
-    # {:stop, {state.pid, reason}, state}
   end
 end

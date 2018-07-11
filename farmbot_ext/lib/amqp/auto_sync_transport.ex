@@ -2,7 +2,7 @@ defmodule Farmbot.AMQP.AutoSyncTransport do
   use GenServer
   use AMQP
   require Farmbot.Logger
-  import Farmbot.Config, only: [get_config_value: 3, update_config_value: 4]
+  import Farmbot.Config, only: [get_config_value: 3]
 
   @exchange "amq.topic"
 
@@ -22,19 +22,6 @@ defmodule Farmbot.AMQP.AutoSyncTransport do
     {:ok, _tag}  = Basic.consume(chan, jwt.bot <> "_auto_sync", self(), [no_ack: true])
 
     {:ok, struct(State, [conn: conn, chan: chan, bot: jwt.bot])}
-  end
-
-  def terminate(reason, state) do
-    ok_reasons = [:normal, :shutdown, :token_refresh]
-    update_config_value(:bool, "settings", "ignore_fbos_config", false)
-
-    if reason not in ok_reasons do
-      Farmbot.Logger.error 1, "AutoSync amqp client Died: #{inspect reason}"
-      update_config_value(:bool, "settings", "log_amqp_connected", true)
-    end
-
-    # If a channel was still open, close it.
-    if state.chan, do: AMQP.Channel.close(state.chan)
   end
 
   # Confirmation sent by the broker after registering this process as a consumer

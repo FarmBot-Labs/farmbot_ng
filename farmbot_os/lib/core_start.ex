@@ -10,7 +10,7 @@ defmodule Farmbot.System.CoreStart do
   def init([]) do
     Application.ensure_all_started(:farmbot_core)
     children = [
-      {Farmbot.System.Watchdog, [Farmbot.Core]}
+      {Farmbot.System.Watchdog, [Farmbot.Core, :farmbot_core]}
     ]
     Supervisor.init(children, [strategy: :one_for_one])
   end
