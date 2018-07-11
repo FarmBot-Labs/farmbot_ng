@@ -1,5 +1,11 @@
 use Mix.Config
 
+config :farmbot_core, :behaviour,
+  firmware_handler: Farmbot.Firmware.StubHandler,
+  leds_handler: Farmbot.Target.Leds.AleHandler,
+  pin_binding_handler: Farmbot.Target.PinBinding.AleHandler,
+  celery_script_io_layer: Farmbot.CeleryScript.StubIOLayer
+
 data_path = Path.join("/", "root")
 config :farmbot_ext,
   data_path: data_path

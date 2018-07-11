@@ -34,10 +34,6 @@ defmodule Farmbot.Target.PinBinding.AleHandler do
     {:ok, struct(State, pins: %{})}
   end
 
-  def handle_demand(_amnt, state) do
-    {:noreply, [], state}
-  end
-
   def handle_call({:register_pin, num}, _from, state) do
     with {:ok, pid} <- GPIO.start_link(num, :input),
          :ok <- GPIO.set_int(pid, :rising) do
@@ -93,7 +89,7 @@ defmodule Farmbot.Target.PinBinding.AleHandler do
       | pins: %{state.pins | pin => %{pin_state | state: signal}}
     }
 
-    {:noreply, [], new_state}
+    {:noreply, new_state}
   end
 
   def handle_info({:gpio_timer, pin}, state) do
@@ -101,9 +97,9 @@ defmodule Farmbot.Target.PinBinding.AleHandler do
 
     if pin_state do
       new_pin_state = %{pin_state | timer: nil}
-      {:noreply, [], %{state | pins: %{state.pins | pin => new_pin_state}}}
+      {:noreply, %{state | pins: %{state.pins | pin => new_pin_state}}}
     else
-      {:noreply, [], state}
+      {:noreply, state}
     end
   end
 end

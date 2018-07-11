@@ -53,7 +53,12 @@ defmodule Farmbot.Asset do
       Farmbot.Registry.dispatch(__MODULE__, {:sync_status, :syncing})
       old = Repo.snapshot()
       Farmbot.Logger.debug(3, "Syncing #{cmd.kind}")
-      do_apply_sync_cmd(cmd)
+      try do
+        do_apply_sync_cmd(cmd)
+      rescue
+        e ->
+          Farmbot.Logger.error(1, "Error syncing: #{mod}: #{Exception.message(e)}")
+      end
       new = Repo.snapshot()
       diff = Snapshot.diff(old, new)
       dispatch_sync(diff)

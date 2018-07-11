@@ -127,18 +127,8 @@ defmodule Farmbot.PinBinding.Manager do
   end
 
   defp do_execute(sequence_id, _env) do
-    # import Farmbot.CeleryScript.AST.Node.Execute, only: [execute: 3]
-    exit("fixme: execute(sequence_id=#{sequence_id})")
-    # try do
-    #   case execute(%{sequence_id: sequence_id}, [], env) do
-    #     {:ok, env} -> env
-    #     {:error, _, env} -> env
-    #   end
-    # rescue
-    #   err ->
-    #     message = Exception.message(err)
-    #     Farmbot.Logger.warn(2, "Failed to execute sequence #{sequence_id} " <> message)
-    #     env
-    # end
+    sequence_id
+    |> Farmbot.Asset.get_sequence_by_id!()
+    |> Farmbot.CeleryScript.execute_sequence()
   end
 end

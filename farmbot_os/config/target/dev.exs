@@ -13,6 +13,12 @@ config :nerves_firmware_ssh,
   authorized_keys: local_key,
   ssh_console_port: 22
 
+config :farmbot_core, :behaviour,
+  firmware_handler: Farmbot.Firmware.StubHandler,
+  leds_handler: Farmbot.Target.Leds.AleHandler,
+  pin_binding_handler: Farmbot.Target.PinBinding.AleHandler,
+  celery_script_io_layer: Farmbot.CeleryScript.StubIOLayer
+
 data_path = Path.join("/", "root")
 config :farmbot_ext,
   data_path: data_path

@@ -65,6 +65,19 @@ config :farmbot_ext, :behaviour,
 config :farmbot_os,
   ecto_repos: [Farmbot.Config.Repo, Farmbot.Logger.Repo, Farmbot.Asset.Repo]
 
+config :farmbot_os, :builtins,
+  sequence: [
+    emergency_lock: -1,
+    emergency_unlock: -2,
+    sync: -3,
+    reboot: -4,
+    power_off: -5
+  ],
+  pin_binding: [
+    emergency_lock: -1,
+    emergency_unlock: -2,
+  ]
+
 case target do
   "host" ->
     import_config("host/#{env}.exs")
