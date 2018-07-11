@@ -134,15 +134,7 @@ defmodule Farmbot.Regimen.Manager do
   defp do_item(item, regimen, state) do
     if item do
       sequence = Farmbot.Asset.get_sequence_by_id!(item.sequence_id)
-      {:ok, ast} = CeleryScript.AST.decode(sequence)
-      ast_with_label = %{ast | args: Map.put(ast.args, :label, sequence.name)}
-
-      Farmbot.Logger.busy(
-        2,
-        "[#{regimen.name} #{regimen.farm_event_id}] is going to execute: #{sequence.name}"
-      )
-
-      Farmbot.CeleryScript.Scheduler.schedule(ast_with_label)
+      CeleryScript.schedule_sequence(sequence)
     end
 
     next_item = List.first(regimen.regimen_items)

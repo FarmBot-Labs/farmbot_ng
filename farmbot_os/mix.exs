@@ -49,7 +49,8 @@ defmodule Farmbot.OS.MixProject do
       {:phoenix_html, "~> 2.11"},
 
       {:farmbot_core, path: "../farmbot_core", env: Mix.env()},
-      {:farmbot_ext, path: "../farmbot_ext", env: Mix.env()}
+      {:farmbot_ext, path: "../farmbot_ext", env: Mix.env()},
+      {:csvm, path: "/home/connor/farmbot/CeleryScript-Runtime", override: true},
     ] ++ deps(@target)
   end
 
@@ -64,7 +65,7 @@ defmodule Farmbot.OS.MixProject do
       {:dhcp_server, "~> 0.4.0"},
       {:mdns, "~> 1.0"},
       {:nerves_init_gadget, "~> 0.4.0", only: :dev},
-
+      {:elixir_ale, "~> 1.0"},
     ] ++ system(target)
   end
 
@@ -80,6 +81,6 @@ defmodule Farmbot.OS.MixProject do
     ["./lib", "./platform/target"]
   end
 
-  defp system("rpi3"), do: [{:nerves_system_farmbot_rpi3, "~> 1.2.1-farmbot.0", runtime: false}]
+  defp system("rpi3"), do: [{:nerves_system_farmbot_rpi3, "1.2.1-farmbot.1", runtime: false}]
   defp system(target), do: Mix.raise("Unknown MIX_TARGET: #{target}")
 end

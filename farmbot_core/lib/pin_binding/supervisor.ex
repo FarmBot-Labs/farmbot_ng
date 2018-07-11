@@ -1,4 +1,5 @@
-defmodule Farmboot.System.Info.Supervisor do
+defmodule Farmbot.PinBinding.Supervisor do
+  @moduledoc false
   use Supervisor
 
   def start_link(args) do
@@ -6,7 +7,9 @@ defmodule Farmboot.System.Info.Supervisor do
   end
 
   def init([]) do
-    children = Application.get_env(:farmbot_os, :system_info_children, [])
+    children = [
+      {Farmbot.PinBinding.Manager, []},
+    ]
     Supervisor.init(children, [strategy: :one_for_one])
   end
 end

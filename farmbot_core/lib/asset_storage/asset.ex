@@ -11,6 +11,7 @@ defmodule Farmbot.Asset do
     Device,
     FarmEvent,
     Peripheral,
+    PinBinding,
     Point,
     Regimen,
     Sensor,
@@ -55,12 +56,27 @@ defmodule Farmbot.Asset do
       do_apply_sync_cmd(cmd)
       new = Repo.snapshot()
       diff = Snapshot.diff(old, new)
-      Farmbot.Registry.dispatch(__MODULE__, {:sync_diff, diff})
-      Farmbot.Registry.dispatch(__MODULE__, {:sync_status, :synced})
+      dispatch_sync(diff)
     else
       Farmbot.Logger.warn(3, "Unknown module: #{mod} #{inspect(cmd)}")
     end
     destroy_sync_cmd(cmd)
+  end
+
+  defp dispatch_sync(diff) do
+    for addition <- diff.additions do
+      Farmbot.Registry.dispatch(__MODULE__, {:addition, addition})
+    end
+
+    for update <- diff.updates do
+      Farmbot.Registry.dispatch(__MODULE__, {:update, update})
+    end
+
+    for deletion <- diff.deletions do
+      Farmbot.Registry.dispatch(__MODULE__, {:deletion, deletion})
+    end
+
+    Farmbot.Registry.dispatch(__MODULE__, {:sync_status, :synced})
   end
 
   # When `body` is nil, it means an object was deleted.
@@ -124,6 +140,10 @@ defmodule Farmbot.Asset do
 
   def destroy_sync_cmd(%SyncCmd{} = cmd) do
     Repo.delete(cmd)
+  end
+
+  def all_pin_bindings do
+    Repo.all(PinBinding)
   end
 
   @doc "Get all Persistent Regimens"

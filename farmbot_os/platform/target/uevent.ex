@@ -8,7 +8,7 @@ defmodule Farmbot.Target.Uevent.Supervisor do
 
   def init([]) do
     children = [{Farmbot.Target.Uevent, []}]
-    supervise(children, [strategy: :one_for_one])
+    Supervisor.init(children, [strategy: :one_for_one])
   end
 end
 

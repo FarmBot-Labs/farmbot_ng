@@ -37,10 +37,18 @@ config :farmbot_core, Farmbot.Asset.Repo,
 
 config :farmbot_os,
   ecto_repos: [Farmbot.Config.Repo, Farmbot.Logger.Repo, Farmbot.Asset.Repo],
-  platform_children: [],
-  system_info_children: [
-    {Farmbot.Platform.SocTempWorker, []},
-    {Farmbot.Platform.Network.InfoSupervisor, []}
+  init_children: [
+    {Farmbot.Target.Leds.AleHandler, []}
+  ],
+  platform_children: [
+    {Farmbot.Firmware.UartHandler.AutoDetector, []},
+    {Farmbot.Target.Bootstrap.Configurator, []},
+    {Farmbot.Target.Network, []},
+    {Farmbot.Target.Network.WaitForTime, []},
+    {Farmbot.Target.Network.TzdataTask, []},
+    {Farmbot.Target.SocTempWorker, []},
+    {Farmbot.Target.Network.InfoSupervisor, []},
+    {Farmbot.Target.Uevent.Supervisor, []},
   ]
 
 config :farmbot_os, :behaviour,

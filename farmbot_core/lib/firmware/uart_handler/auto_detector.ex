@@ -15,6 +15,7 @@ defmodule Farmbot.Firmware.UartHandler.AutoDetector do
   alias Farmbot.Firmware.{UartHandler, StubHandler, Utils}
   import Utils
   require Farmbot.Logger
+  use GenServer
 
   #TODO(Connor) - Maybe make this configurable?
   @ignore_devs ["ttyAMA0", "ttyS0", "ttyS3"]
@@ -25,8 +26,8 @@ defmodule Farmbot.Firmware.UartHandler.AutoDetector do
   end
 
   @doc false
-  def start_link(_, _) do
-    GenServer.start_link(__MODULE__, [])
+  def start_link(args) do
+    GenServer.start_link(__MODULE__, args, [name: __MODULE__])
   end
 
   def init([]) do

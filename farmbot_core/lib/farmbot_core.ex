@@ -22,13 +22,13 @@ defmodule Farmbot.Core do
 
   def init([]) do
     children = [
-      {Farmbot.Registry,               [] },
-      {Farmbot.Logger.Supervisor,      [] },
-      {Farmbot.Config.Supervisor,      [] },
-      {Farmbot.Asset.Supervisor,       [] },
-      {Farmbot.Firmware.Supervisor,    [] },
-      {Farmbot.BotState,               [] },
-      {Farmbot.CeleryScript.Scheduler, [] }
+      {Farmbot.Registry,                [] },
+      {Farmbot.Logger.Supervisor,       [] },
+      {Farmbot.Config.Supervisor,       [] },
+      {Farmbot.Asset.Supervisor,        [] },
+      {Farmbot.Firmware.Supervisor,     [] },
+      {Farmbot.BotState,                [] },
+      {Farmbot.CeleryScript.Supervisor, [] },
     ]
     Supervisor.init(children, [strategy: :one_for_one])
   end

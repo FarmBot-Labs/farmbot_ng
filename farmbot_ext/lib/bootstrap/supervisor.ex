@@ -52,7 +52,7 @@ defmodule Farmbot.Bootstrap.Supervisor do
   """
 
   use Supervisor
-  alias Farmbot.Bootstrap.Authorization, as: Auth
+  # alias Farmbot.Bootstrap.Authorization, as: Auth
   alias Farmbot.Config
   import Config, only: [update_config_value: 4, get_config_value: 3]
   require Farmbot.Logger

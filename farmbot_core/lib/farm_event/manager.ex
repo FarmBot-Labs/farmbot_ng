@@ -21,7 +21,7 @@ defmodule Farmbot.FarmEvent.Manager do
   require Farmbot.Logger
   alias Farmbot.Asset
   alias Farmbot.Asset.{FarmEvent, Sequence, Regimen}
-  alias Farmbot.Asset.Repo.Registry
+  alias Farmbot.Registry
 
   @checkup_time 1000
   # @checkup_time 15_000
@@ -39,7 +39,7 @@ defmodule Farmbot.FarmEvent.Manager do
   end
 
   def init([]) do
-    # Registry.subscribe() # fixme
+    Farmbot.Registry.subscribe()
     send(self(), :checkup)
     {:ok, struct(State)}
   end
@@ -48,14 +48,14 @@ defmodule Farmbot.FarmEvent.Manager do
     Farmbot.Logger.error(1, "FarmEvent Manager terminated: #{inspect(reason)}")
   end
 
-  def handle_info({Registry, :addition, FarmEvent, data}, state) do
+  def handle_info({Registry, {Asset, {:addition, %FarmEvent{} = data}}}, state) do
     maybe_farm_event_log("Starting monitor on FarmEvent: #{data.id}.")
 
     Map.put(state.events, data.id, data)
     |> reindex(state)
   end
 
-  def handle_info({Registry, :deletion, FarmEvent, data}, state) do
+  def handle_info({Registry, {Asset, {:deletion, %FarmEvent{} = data}}}, state) do
     maybe_farm_event_log("Destroying monitor on FarmEvent: #{data.id}.")
 
     if String.contains?(data.executable_type, "Regimen") do
@@ -70,7 +70,7 @@ defmodule Farmbot.FarmEvent.Manager do
     |> reindex(state)
   end
 
-  def handle_info({Registry, :update, FarmEvent, data}, state) do
+  def handle_info({Registry, {Asset, {:update, %FarmEvent{} = data}}}, state) do
     maybe_farm_event_log("Reindexing monitor on FarmEvent: #{data.id}.")
 
     if String.contains?(data.executable_type, "Regimen") do
@@ -88,17 +88,17 @@ defmodule Farmbot.FarmEvent.Manager do
     |> reindex(state)
   end
 
-  def handle_info({Registry, :deletion, Regimen, data}, state) do
+  def handle_info({Registry, {Asset, {:deletion, %Regimen{} = data}}}, state) do
     Farmbot.Regimen.Supervisor.stop_all_managers(data)
     {:noreply, state}
   end
 
-  def handle_info({Registry, :update, Regimen, data}, state) do
+  def handle_info({Registry, {Asset, {:update, %Regimen{} = data}}}, state) do
     Farmbot.Regimen.Supervisor.reindex_all_managers(data)
     {:noreply, state}
   end
 
-  def handle_info({Registry, :update, Sequence, sequence}, state) do
+  def handle_info({Registry, {Asset, {:update, %Sequence{} = sequence}}}, state) do
     for reg <- Farmbot.Asset.get_regimens_using_sequence(sequence.id) do
       Farmbot.Regimen.Supervisor.reindex_all_managers(reg)
     end
@@ -106,7 +106,7 @@ defmodule Farmbot.FarmEvent.Manager do
     {:noreply, state}
   end
 
-  def handle_info({Registry, _, _, _}, state) do
+  def handle_info({Registry, _}, state) do
     {:noreply, state}
   end
 

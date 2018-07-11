@@ -125,7 +125,7 @@ defmodule Farmbot.Firmware.StubHandler do
     {:noreply, [:idle, :report_no_config, :idle], state}
   end
 
-  def handle_call(cmd, _from, %{locked?: true} = state) when cmd != :emergency_unlock do
+  def handle_call(cmd, _from, %{locked?: true} = state) when cmd not in [:emergency_unlock, :update_param] do
     {:reply, :ok, [:error], state}
   end
 

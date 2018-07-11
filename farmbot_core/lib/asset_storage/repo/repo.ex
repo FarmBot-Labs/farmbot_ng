@@ -10,6 +10,7 @@ defmodule Farmbot.Asset.Repo do
     Device,
     FarmEvent,
     Peripheral,
+    PinBinding,
     Point,
     Regimen,
     Sensor,
@@ -21,6 +22,7 @@ defmodule Farmbot.Asset.Repo do
     results = Farmbot.Asset.Repo.all(Device) ++
     Farmbot.Asset.Repo.all(FarmEvent) ++
     Farmbot.Asset.Repo.all(Peripheral) ++
+    Farmbot.Asset.Repo.all(PinBinding) ++
     Farmbot.Asset.Repo.all(Point) ++
     Farmbot.Asset.Repo.all(Regimen) ++
     Farmbot.Asset.Repo.all(Sensor) ++

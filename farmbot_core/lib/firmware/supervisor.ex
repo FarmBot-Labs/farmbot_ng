@@ -4,7 +4,7 @@ defmodule Farmbot.Firmware.Supervisor do
 
   @doc "Reinitializes the Firmware stack. Warning has MANY SIDE EFFECTS."
   def reinitialize do
-    Farmbot.Firmware.UartHandler.AutoDetector.start_link(:normal, [])
+    Farmbot.Firmware.UartHandler.AutoDetector.start_link([])
     Supervisor.terminate_child(Farmbot.Bootstrap.Supervisor, Farmbot.Firmware.Supervisor)
   end
 

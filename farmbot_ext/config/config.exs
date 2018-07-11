@@ -18,7 +18,9 @@ config :ssl, protocol_version: :"tlsv1.2"
 
 config :farmbot_core, :behaviour,
   firmware_handler: Farmbot.Firmware.StubHandler,
-  celery_scheduler: Farmbot.CeleryScript.StubScheduler
+  leds_handler: Farmbot.Leds.StubHandler,
+  pin_binding_handler: Farmbot.PinBinding.StubHandler,
+  celery_script_io_layer: Farmbot.CeleryScript.StubIOLayer
 
 config :farmbot_core,
   ecto_repos: [Farmbot.Config.Repo, Farmbot.Logger.Repo, Farmbot.Asset.Repo],

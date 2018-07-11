@@ -11,9 +11,9 @@ defmodule Farmbot.BotState.InformationalSettings do
     soc_temp: nil,
     wifi_level: nil,
     firmware_version: nil,
-    sync_status: nil,
+    sync_status: :sync_now,
+    last_status: :sync_now,
     locked: nil,
-    last_status: nil,
     cache_bust: nil,
     busy: nil
   ]

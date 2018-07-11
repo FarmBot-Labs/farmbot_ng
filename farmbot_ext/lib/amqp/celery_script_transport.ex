@@ -60,14 +60,28 @@ defmodule Farmbot.AMQP.CeleryScriptTransport do
   def handle_info({:basic_deliver, payload, %{routing_key: key}}, state) do
     device = state.bot
     ["bot", ^device, "from_clients"] = String.split(key, ".")
-    handle_celery_script(payload, state)
+    reply = handle_celery_script(payload, state)
+    :ok = AMQP.Basic.publish state.chan, @exchange, "bot.#{device}.from_device", reply
     {:noreply, state}
   end
 
   @doc false
   def handle_celery_script(payload, _state) do
     json = Farmbot.JSON.decode!(payload)
-    {:ok, ast} = Farmbot.CeleryScript.AST.decode(json)
-    Farmbot.CeleryScript.Scheduler.schedule(ast)
+    %Farmbot.Asset.Sequence{
+      name: json["args"]["label"],
+      args: json["args"],
+      body: json["body"],
+      kind: "sequence",
+      id: -1}
+    |> Farmbot.CeleryScript.execute_sequence()
+    |> case do
+      %{status: :crashed} = proc ->
+        expl = %{args: %{message: Csvm.FarmProc.get_crash_reason(proc)}}
+        %{args: %{label: json["args"]["label"]}, kind: "rpc_error", body: [expl]}
+      _ ->
+        %{args: %{label: json["args"]["label"]}, kind: "rpc_ok"}
+    end
+    |> Farmbot.JSON.encode!()
   end
 end

@@ -7,13 +7,11 @@ defmodule Farmbot.OS do
 
   def start(_type, _args) do
     children = [
-      {Farmbot.System.Init.FSCheckup, []},
-      {Farmbot.System.Init.Ecto, []},
+      {Farmbot.System.Init.Supervisor, []},
       {Farmbot.System.CoreStart, []},
       {Farmbot.Platform.Supervisor, []},
       {Farmbot.System.UpdateTimer, []},
       {Farmbot.System.ExtStart, []},
-      {Farmbot.System.Info.Supervisor, []},
       {Farmbot.EasterEggs, [] }
     ]
     opts = [strategy: :one_for_one, name: __MODULE__]

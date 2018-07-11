@@ -34,9 +34,9 @@ defmodule Farmbot.AMQP.BotStateTransport do
     if state.chan, do: AMQP.Channel.close(state.chan)
   end
 
-  def handle_info({Farmbot.Registry, {Farmbot.BotState, bot_state}}, %{state_cache: bot_state} = state) do
-    {:noreply, state}
-  end
+  # def handle_info({Farmbot.Registry, {Farmbot.BotState, bot_state}}, %{state_cache: bot_state} = state) do
+  #   {:noreply, state}
+  # end
 
   def handle_info({Farmbot.Registry, {Farmbot.BotState, bot_state}}, state) do
     cache = push_bot_state(state.chan, state.bot, bot_state)

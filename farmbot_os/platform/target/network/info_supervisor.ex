@@ -2,8 +2,8 @@ defmodule Farmbot.Target.Network.InfoSupervisor do
   use GenServer
   alias Farmbot.Config
 
-  def start_link(_, opts) do
-    Supervisor.start_link(__MODULE__, [], opts)
+  def start_link(args) do
+    Supervisor.start_link(__MODULE__, args, [name: __MODULE__])
   end
 
   def init([]) do

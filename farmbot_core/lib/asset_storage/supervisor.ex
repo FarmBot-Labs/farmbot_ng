@@ -12,6 +12,7 @@ defmodule Farmbot.Asset.Supervisor do
       {Farmbot.Regimen.NameProvider, [] },
       {Farmbot.FarmEvent.Supervisor, [] },
       {Farmbot.Regimen.Supervisor,   [] },
+      {Farmbot.PinBinding.Supervisor,  [] },
     ]
     Supervisor.init(children, [strategy: :one_for_one])
   end
