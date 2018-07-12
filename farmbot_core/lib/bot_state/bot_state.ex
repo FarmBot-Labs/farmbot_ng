@@ -96,6 +96,7 @@ defmodule Farmbot.BotState do
 
   @doc false
   def handle_call(:fetch, _from, state) do
+    Farmbot.Registry.dispatch(__MODULE__, state)
     {:reply, state, [], state}
   end
 
