@@ -9,7 +9,6 @@ defmodule Farmbot.System.Watchdog do
   end
 
   def init([pid, app]) do
-    Process.flag(:trap_exit, true)
     ref = Process.monitor(pid)
     {:ok, %{monitor: ref, pid: pid, app: app}}
   end

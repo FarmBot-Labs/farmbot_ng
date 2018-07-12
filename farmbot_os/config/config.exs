@@ -9,11 +9,11 @@ use Mix.Config
 target = Mix.Project.config()[:target]
 env = Mix.env()
 
-config :logger, [
-  utc_log: true,
-  handle_otp_reports: true,
-  handle_sasl_reports: true,
-]
+# config :logger, [
+#   utc_log: true,
+#   handle_otp_reports: true,
+#   handle_sasl_reports: true,
+# ]
 
 # Customize non-Elixir parts of the firmware.  See
 # https://hexdocs.pm/nerves/advanced-configuration.html for details.

@@ -29,6 +29,7 @@ defmodule Farmbot.System.Init.FSCheckup do
       File.mkdir(@data_path)
     end
 
+    setup_boot_state_file()
     setup_multi_user()
 
     Logger.debug("Checking #{check_file}")
@@ -58,6 +59,13 @@ defmodule Farmbot.System.Init.FSCheckup do
     multiuser_dir = Path.join([@data_path, "users", "default"])
     unless File.exists?(multiuser_dir) do
       File.mkdir_p(multiuser_dir)
+    end
+  end
+
+  defp setup_boot_state_file do
+    file = Path.join(@data_path, "boot_state")
+    unless File.exists?(file) do
+      Farmbot.BootState.write(:NEEDS_CONFIGURATION)
     end
   end
 end

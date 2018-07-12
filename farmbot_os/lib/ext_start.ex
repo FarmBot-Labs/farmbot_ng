@@ -1,6 +1,7 @@
 defmodule Farmbot.System.ExtStart do
   @moduledoc false
   use Supervisor
+  require Logger
 
   @doc false
   def start_link(args) do
@@ -8,10 +9,23 @@ defmodule Farmbot.System.ExtStart do
   end
 
   def init([]) do
-    Application.ensure_all_started(:farmbot_ext)
+    :ok = start_ext_app(Farmbot.BootState.read())
     children = [
       {Farmbot.System.Watchdog, [Farmbot.Ext, :farmbot_ext]}
     ]
     Supervisor.init(children, [strategy: :one_for_one])
+  end
+
+  defp start_ext_app(state) do
+    case Application.ensure_all_started(:farmbot_ext) do
+      {:ok, _} ->
+        Farmbot.BootState.write(:UPANDRUNNING)
+        :ok
+      {:error, {:farmbot_ext, {{:shutdown, {:failed_to_start_child, child, reason}}, _}}} ->
+        msg = "Failed to start farmbot_ext while in state: #{inspect state} child: #{child} => #{inspect reason}"
+        Logger.error(msg)
+        Farmbot.System.factory_reset(msg)
+        {:error, msg}
+    end
   end
 end
