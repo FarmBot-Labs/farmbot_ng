@@ -81,6 +81,11 @@ defmodule Farmbot.BotState do
     GenStage.call(__MODULE__, {:report_wifi_level, level})
   end
 
+  @doc "Put FBOS into maintenance mode."
+  def enter_maintenance_mode do
+    GenStage.call(__MODULE__, :enter_maintenance_mode)
+  end
+
   @doc false
   def start_link(args) do
     GenStage.start_link(__MODULE__, args, [name: __MODULE__])
@@ -125,6 +130,13 @@ defmodule Farmbot.BotState do
 
   def handle_call({:report_wifi_level, level}, _form, state) do
     event = {:informational_settings, %{wifi_level: level}}
+    new_state = handle_event(event, state)
+    Farmbot.Registry.dispatch(__MODULE__, new_state)
+    {:reply, :ok, [], new_state}
+  end
+
+  def handle_call(:enter_maintenance_mode _form, state) do
+    event = {:informational_settings, %{sync_status: :maintenance}}
     new_state = handle_event(event, state)
     Farmbot.Registry.dispatch(__MODULE__, new_state)
     {:reply, :ok, [], new_state}

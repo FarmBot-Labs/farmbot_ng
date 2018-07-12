@@ -50,7 +50,7 @@ defmodule Farmbot.OS.MixProject do
 
       {:farmbot_core, path: "../farmbot_core", env: Mix.env()},
       {:farmbot_ext, path: "../farmbot_ext", env: Mix.env()},
-      # {:csvm, path: "/home/connor/farmbot/CeleryScript-Runtime", override: true},
+      {:csvm, path: "/home/connor/farmbot/CeleryScript-Runtime", override: true},
     ] ++ deps(@target)
   end
 

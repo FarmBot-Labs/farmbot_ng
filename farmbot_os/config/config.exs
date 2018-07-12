@@ -48,7 +48,7 @@ config :farmbot_core, :behaviour,
   firmware_handler: Farmbot.Firmware.StubHandler,
   leds_handler: Farmbot.Leds.StubHandler,
   pin_binding_handler: Farmbot.PinBinding.StubHandler,
-  celery_script_io_layer: Farmbot.CeleryScript.StubIOLayer
+  celery_script_io_layer: Farmbot.OS.IOLayer
 
 config :farmbot_core,
   expected_fw_versions: ["6.4.0.F", "6.4.0.R", "6.4.0.G"],

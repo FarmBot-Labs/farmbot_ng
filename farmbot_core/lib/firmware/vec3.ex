@@ -1,5 +1,6 @@
 defmodule Farmbot.Firmware.Vec3 do
   @moduledoc "A three position vector."
+  alias Farmbot.Firmware.Vec3
 
   defstruct [x: -1.0, y: -1.0, z: -1.0]
 
@@ -8,6 +9,10 @@ defmodule Farmbot.Firmware.Vec3 do
 
   @typedoc @moduledoc
   @type t :: %__MODULE__{x: number, y: number, z: number}
+
+  def new(x, y, z) do
+    %Vec3{x: x, y: y, z: z}
+  end
 end
 
 defimpl Inspect, for: Farmbot.Firmware.Vec3 do

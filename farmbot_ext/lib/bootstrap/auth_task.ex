@@ -34,7 +34,7 @@ defmodule Farmbot.Bootstrap.AuthTask do
     auth_task = Application.get_env(:farmbot_ext, :behaviour)[:authorization]
     {email, pass, server} = {fetch_email(), fetch_pass(), fetch_server()}
     Farmbot.Logger.busy(3, "refreshing token: #{email} - #{server}")
-    case auth_task.authorize(email, pass, server) do
+    case auth_task.authorize_with_password(email, pass, server) do
       {:ok, token} ->
         Farmbot.Logger.success(3, "Successful authorization: #{email} - #{server}")
         update_config_value(:bool, "settings", "first_boot", false)
