@@ -358,23 +358,16 @@ defmodule Farmbot.Firmware do
   defp handle_gcode(:idle, state) do
     maybe_cancel_timer(state.timer, state.current)
     if state.current do
-      # This might be a bug in the FW
-      if state.current.fun in [:home, :home_all] do
-        Farmbot.Logger.warn 1, "Got idle during home."
+        Farmbot.Logger.warn 1, "Got idle while executing a command."
         timer = start_timer(state.current, state.timeout_ms)
         {nil, %{state | timer: timer}}
-      else
-        Farmbot.Logger.warn 1, "Got idle while executing a command."
-        do_reply(state, {:error, :timeout})
-        {:informational_settings, %{busy: false, locked: false}, %{state | current: nil, idle: true}}
-      end
     else
       {:informational_settings, %{busy: false, locked: false}, %{state | idle: true}}
     end
   end
 
   defp handle_gcode({:report_current_position, x, y, z}, state) do
-    {:location_data, %{position: %{x: round(x), y: round(y), z: round(z)}}, state}
+    {:location_data, %{position: %{x: x, y: y, z: z}}, state}
   end
 
   defp handle_gcode({:report_encoder_position_scaled, x, y, z}, state) do
@@ -555,6 +548,10 @@ defmodule Farmbot.Firmware do
     end
   end
 
+  defp start_timer(%Command{} = command, timeout) do
+    Process.send_after(self(), {:command_timeout, command}, timeout)
+  end
+
   defp maybe_update_param_from_report(param, val) when is_binary(param) do
     real_val = if val, do: (val / 1), else: nil
     # Farmbot.Logger.debug 3, "Firmware reported #{param} => #{val || -1}"
@@ -628,9 +625,5 @@ defmodule Farmbot.Firmware do
         EstopTimer.start_timer()
       end
     end
-  end
-
-  defp start_timer(%Command{} = command, timeout) do
-    Process.send_after(self(), {:command_timeout, command}, timeout)
   end
 end
