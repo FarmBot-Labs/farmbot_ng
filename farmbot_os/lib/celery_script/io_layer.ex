@@ -71,7 +71,7 @@ defmodule Farmbot.OS.IOLayer do
   end
 
   def handle_io(%{kind: :factory_reset, args: %{package: :farmbot_os}}) do
-    :ok = Farmbot.BotState.enter_maintenance_mode(:maintenance)
+    :ok = Farmbot.BotState.enter_maintenance_mode()
     update_config_value(:bool, "settings", "disable_factory_reset", false)
     Farmbot.Logger.warn 1, "Farmbot OS going down for factory reset!"
     Farmbot.System.factory_reset "CeleryScript request."
@@ -114,7 +114,7 @@ defmodule Farmbot.OS.IOLayer do
   end
 
   def handle_io(%{kind: :power_off}) do
-    :ok = Farmbot.BotState.enter_maintenance_mode(:maintenance)
+    :ok = Farmbot.BotState.enter_maintenance_mode()
     Farmbot.System.shutdown("CeleryScript request")
     :ok
   end

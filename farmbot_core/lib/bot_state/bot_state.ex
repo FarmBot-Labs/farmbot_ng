@@ -135,7 +135,7 @@ defmodule Farmbot.BotState do
     {:reply, :ok, [], new_state}
   end
 
-  def handle_call(:enter_maintenance_mode _form, state) do
+  def handle_call(:enter_maintenance_mode, _form, state) do
     event = {:informational_settings, %{sync_status: :maintenance}}
     new_state = handle_event(event, state)
     Farmbot.Registry.dispatch(__MODULE__, new_state)
