@@ -85,7 +85,6 @@ defmodule Farmbot.Bootstrap.Authorization do
   def request({method, url, payload, headers}, state) do
     case HTTPoison.request(method, url, payload, headers) do
       {:ok, %{status_code: c, body: body}} when (c >= 200) and (c <= 299) ->
-        IO.inspect(body, label: "successful request")
         {:ok, body}
       {:ok, %{status_code: c, body: body}} when (c >= 400) and (c <= 499) ->
         err = get_error_message(body)
