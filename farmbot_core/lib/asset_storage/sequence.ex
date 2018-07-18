@@ -3,6 +3,7 @@ defmodule Farmbot.Asset.Sequence do
   A Sequence is a list of CeleryScript nodes.
   """
 
+  alias Farmbot.Asset.Sequence
   alias Farmbot.EctoTypes.TermType
   use Ecto.Schema
   import Ecto.Changeset
@@ -16,7 +17,7 @@ defmodule Farmbot.Asset.Sequence do
 
   @required_fields [:id, :name, :kind, :args, :body]
 
-  def changeset(sequence, params \\ %{}) do
+  def changeset(%Sequence{} = sequence, params \\ %{}) do
     sequence
     |> cast(params, @required_fields)
     |> validate_required(@required_fields)
@@ -24,7 +25,7 @@ defmodule Farmbot.Asset.Sequence do
   end
 
   @behaviour Farmbot.Asset.FarmEvent
-  def schedule_event(sequence, _now) do
+  def schedule_event(%Sequence{} = sequence, _now) do
     case Farmbot.CeleryScript.schedule_sequence(sequence) do
       %Csvm.FarmProc{status: :crashed} = proc -> {:error, Csvm.FarmProc.get_crash_reason(proc)}
       _ -> :ok

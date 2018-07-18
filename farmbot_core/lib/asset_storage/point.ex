@@ -1,6 +1,7 @@
 defmodule Farmbot.Asset.Point do
   @moduledoc "A Point is a location in the planting bed as denoted by X Y and Z."
 
+  alias Farmbot.Asset.Point
   use Ecto.Schema
   import Ecto.Changeset
   alias Farmbot.Asset.Repo.ModuleType
@@ -19,8 +20,8 @@ defmodule Farmbot.Asset.Point do
   @required_fields [:id, :name, :x, :y, :z, :meta, :pointer_type]
   @optional_fields [:tool_id]
 
-  def changeset(point, params \\ %{}) do
-    point
+  def changeset(%Point{} = point, params \\ %{}) do
+    %Point{} = point
     |> cast(params, @required_fields ++ @optional_fields)
     |> validate_required(@required_fields)
   end

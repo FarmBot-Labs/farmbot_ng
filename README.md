@@ -14,6 +14,7 @@ Restructure of FarmbotOS to fix network and log errors.
    * Avoid factory resetting at all costs
    * Where to put factory reset code? `farmbot_os` i guess?
    * how to handle lower deps crashing?
+* http syncing
 
 # Things that have been migrated
 * asset storage -> `farmbot_core`

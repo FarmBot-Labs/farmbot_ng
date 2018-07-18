@@ -3,6 +3,7 @@ defmodule Farmbot.Asset.Peripheral do
   Peripherals are descriptors for pins/modes.
   """
 
+  alias Farmbot.Asset.Peripheral
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -14,7 +15,7 @@ defmodule Farmbot.Asset.Peripheral do
 
   @required_fields [:id, :pin, :mode, :label]
 
-  def changeset(peripheral, params \\ %{}) do
+  def changeset(%Peripheral{} = peripheral, params \\ %{}) do
     peripheral
     |> cast(params, @required_fields)
     |> validate_required(@required_fields)

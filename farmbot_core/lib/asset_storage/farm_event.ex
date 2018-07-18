@@ -21,6 +21,7 @@ defmodule Farmbot.Asset.FarmEvent do
 
   @callback schedule_event(map, DateTime.t) :: any
 
+  alias Farmbot.Asset.FarmEvent
   alias Farmbot.Asset.Repo.ModuleType
   alias Farmbot.EctoTypes.TermType
 
@@ -48,7 +49,7 @@ defmodule Farmbot.Asset.FarmEvent do
     :executable_id
   ]
 
-  def changeset(farm_event, params \\ %{}) do
+  def changeset(%FarmEvent{} = farm_event, params \\ %{}) do
     farm_event
     |> build_calendar
     |> cast(params, @required_fields ++ [:calendar])
@@ -57,15 +58,15 @@ defmodule Farmbot.Asset.FarmEvent do
   end
 
   @compile {:inline, [build_calendar: 1]}
-  def build_calendar(%__MODULE__{executable_type: Farmbot.Asset.Regimen} = fe),
+  def build_calendar(%FarmEvent{executable_type: Farmbot.Asset.Regimen} = fe),
     do: fe
 
-  def build_calendar(%__MODULE__{calendar: nil} = fe),
+  def build_calendar(%FarmEvent{calendar: nil} = fe),
     do: build_calendar(%{fe | calendar: []})
 
-  def build_calendar(%__MODULE__{time_unit: "never"} = fe), do: %{fe | calendar: [fe.start_time]}
+  def build_calendar(%FarmEvent{time_unit: "never"} = fe), do: %{fe | calendar: [fe.start_time]}
 
-  def build_calendar(%__MODULE__{calendar: calendar} = fe)
+  def build_calendar(%FarmEvent{calendar: calendar} = fe)
       when is_list(calendar) do
     current_time_seconds = :os.system_time(:second)
 

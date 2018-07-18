@@ -1,6 +1,7 @@
 defmodule Farmbot.Asset.Tool do
   @moduledoc "A Tool is an item that lives in a ToolSlot"
 
+  alias Farmbot.Asset.Tool
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -10,8 +11,8 @@ defmodule Farmbot.Asset.Tool do
 
   @required_fields [:id, :name]
 
-  def changeset(farm_event, params \\ %{}) do
-    farm_event
+  def changeset(%Tool{} = tool, params \\ %{}) do
+    tool
     |> cast(params, @required_fields)
     |> validate_required(@required_fields)
     |> unique_constraint(:id)

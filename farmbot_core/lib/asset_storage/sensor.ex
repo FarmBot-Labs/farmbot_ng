@@ -3,6 +3,7 @@ defmodule Farmbot.Asset.Sensor do
   Sensors are descriptors for pins/modes.
   """
 
+  alias Farmbot.Asset.Sensor 
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -14,8 +15,8 @@ defmodule Farmbot.Asset.Sensor do
 
   @required_fields [:id, :pin, :mode, :label]
 
-  def changeset(peripheral, params \\ %{}) do
-    peripheral
+  def changeset(%Sensor{} = sensor, params \\ %{}) do
+    %Sensor{} = sensor
     |> cast(params, @required_fields)
     |> validate_required(@required_fields)
     |> unique_constraint(:id)

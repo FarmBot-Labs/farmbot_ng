@@ -4,9 +4,10 @@ defmodule Farmbot.Asset.PersistentRegimen do
   it is set to operate on. These are stored in the database to persist reboots,
   crashes etc.
   """
+
+  alias Farmbot.Asset.PersistentRegimen
   use Ecto.Schema
   import Ecto.Changeset
-  alias Farmbot.Asset.PersistentRegimen
 
   schema "persistent_regimens" do
     field :regimen_id, :integer

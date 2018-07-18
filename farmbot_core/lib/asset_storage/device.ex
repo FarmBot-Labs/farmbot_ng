@@ -4,6 +4,7 @@ defmodule Farmbot.Asset.Device do
   problem probably higher up the stack.
   """
 
+  alias Farmbot.Asset.Device
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -14,7 +15,7 @@ defmodule Farmbot.Asset.Device do
 
   @required_fields [:id, :name]
 
-  def changeset(device, params \\ %{}) do
+  def changeset(%Device{} = device, params \\ %{}) do
     device
     |> cast(params, @required_fields)
     |> validate_required(@required_fields)

@@ -29,7 +29,6 @@ defmodule Farmbot.Asset do
   def fragment_sync(verbosity \\ 1) do
     Farmbot.Logger.busy verbosity, "Syncing"
     Farmbot.Registry.dispatch(__MODULE__, {:sync_status, :syncing})
-    old = Repo.snapshot()
     all_sync_cmds = all_sync_cmds()
 
     Repo.transaction fn() ->
@@ -38,9 +37,6 @@ defmodule Farmbot.Asset do
       end
     end
 
-    new = Repo.snapshot()
-    diff = Snapshot.diff(old, new)
-    Farmbot.Registry.dispatch(__MODULE__, {:sync_diff, diff})
     destroy_all_sync_cmds()
     Farmbot.Registry.dispatch(__MODULE__, {:sync_status, :synced})
     Farmbot.Logger.success verbosity, "Synced"
@@ -69,16 +65,16 @@ defmodule Farmbot.Asset do
   end
 
   defp dispatch_sync(diff) do
-    for addition <- diff.additions do
-      Farmbot.Registry.dispatch(__MODULE__, {:addition, addition})
+    for deletion <- diff.deletions do
+      Farmbot.Registry.dispatch(__MODULE__, {:deletion, deletion})
     end
 
     for update <- diff.updates do
       Farmbot.Registry.dispatch(__MODULE__, {:update, update})
     end
 
-    for deletion <- diff.deletions do
-      Farmbot.Registry.dispatch(__MODULE__, {:deletion, deletion})
+    for addition <- diff.additions do
+      Farmbot.Registry.dispatch(__MODULE__, {:addition, addition})
     end
 
     Farmbot.Registry.dispatch(__MODULE__, {:sync_status, :synced})
@@ -110,8 +106,9 @@ defmodule Farmbot.Asset do
       # if there is an existing record, copy the ecto  meta from the old
       # record. This allows `insert_or_update` to work properly.
       existing ->
-        mod.changeset(existing, not_struct)
-        |> Repo.update!
+        existing
+        |> Ecto.Changeset.change(not_struct)
+        |> Repo.update!()
         :ok
     end
   end

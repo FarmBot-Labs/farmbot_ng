@@ -1,6 +1,7 @@
 defmodule Farmbot.Asset.SyncCmd do
   @moduledoc "describes an update to a API resource."
 
+  alias Farmbot.Asset.SyncCmd
   use Ecto.Schema
   import Ecto.Changeset
   alias Farmbot.EctoTypes.TermType
@@ -14,7 +15,7 @@ defmodule Farmbot.Asset.SyncCmd do
 
   @required_fields [:remote_id, :kind]
 
-  def changeset(%__MODULE__{} = cmd, params \\ %{}) do
+  def changeset(%SyncCmd{} = cmd, params \\ %{}) do
     cmd
     |> cast(params, @required_fields)
     |> validate_required(@required_fields)
