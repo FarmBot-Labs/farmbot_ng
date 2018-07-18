@@ -33,7 +33,6 @@ defmodule Farmbot.Registry do
     partitions = 1
     opts = [keys: :duplicate, partitions: partitions, name: @reg]
     {:ok, reg} = Elixir.Registry.start_link(opts)
-    # Farmbot.Registry.Logger.start_link([])
     {:ok, %{reg: reg}}
   end
 
