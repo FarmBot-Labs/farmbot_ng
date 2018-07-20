@@ -8,12 +8,14 @@ defmodule Farmbot.PinBinding.Manager do
   @handler Application.get_env(:farmbot_core, :behaviour)[:pin_binding_handler]
   @handler || Mix.raise("No pin binding handler.")
 
-  defstruct [registered: %{}, handler: nil]
+  defstruct registered: %{},
+            signal: %{},
+            handler: nil
 
   # Should be called by a handler
   @doc false
-  def trigger(pin) do
-    GenServer.cast(__MODULE__, {:pin_trigger, pin})
+  def trigger(pin, signal) do
+    GenServer.cast(__MODULE__, {:pin_trigger, pin, signal})
   end
 
   @doc false
@@ -26,16 +28,16 @@ defmodule Farmbot.PinBinding.Manager do
       {:ok, handler} ->
         Farmbot.Registry.subscribe(self())
         all = Asset.all_pin_bindings()
-        state = initial_state(all, struct(State, handler: handler))
-        {:ok, state}
-      err -> err
+        {:ok, initial_state(all, %State{handler: handler})}
+      err ->
+        err
     end
   end
 
   def terminate(reason, state) do
     if state.handler do
       if Process.alive?(state.handler) do
-        GenServer.stop(state.handler, reason)
+        GenStage.stop(state.handler, reason)
       end
     end
   end
@@ -52,15 +54,34 @@ defmodule Farmbot.PinBinding.Manager do
     end
   end
 
-  def handle_cast({:pin_trigger, pin}, state) do
-    case state.registered[pin] do
-      %PinBinding{} = binding ->
-        Farmbot.Logger.busy(1, "PinBinding #{pin} triggered")
+  def handle_cast({:pin_trigger, pin, :falling}, state) do
+    binding = state.registered[pin]
+    if binding do
+      do_usr_led(binding, :off)
+      if state.signal[pin] do
+        Process.cancel_timer(state.signal[pin])
+        {:noreply, %{state | signal: Map.put(state.signal, pin, debounce_timer(pin))}}
+      else
+        Farmbot.Logger.busy(1, "Pin Binding #{binding} triggered #{binding.special_action || "execute_sequence"}")
         do_execute(binding)
-      nil ->
-        Farmbot.Logger.warn(3, "No sequence assosiated with: #{pin}")
+        {:noreply, %{state | signal: Map.put(state.signal, pin, debounce_timer(pin))}}
+      end
+    else
+      Farmbot.Logger.warn(3, "No Pin Binding assosiated with: #{pin}")
+      {:noreply, state}
+    end
+  end
+
+  def handle_cast({:pin_trigger, pin, :rising}, state) do
+    binding = state.registered[pin]
+    if binding do
+      do_usr_led(binding, :solid)
     end
     {:noreply, state}
+  end
+
+  def handle_info({pin, :ok}, state) do
+    {:noreply, %{state | signal: Map.put(state.signal, pin, nil)}}
   end
 
   def handle_info({Farmbot.Registry, {Asset, {:addition, %PinBinding{} = binding}}}, state) do
@@ -85,48 +106,52 @@ defmodule Farmbot.PinBinding.Manager do
   end
 
   defp register_pin(state, %PinBinding{pin_num: pin_num} = binding) do
-    Farmbot.Logger.info 1, "Registering #{pin_num} to sequence by id"
     case state.registered[pin_num] do
       nil ->
         case @handler.register_pin(pin_num) do
           :ok -> do_register(state, binding)
 
           {:error, reason} ->
-            Farmbot.Logger.error(1, "Error registering pin: #{inspect reason}")
+            error_log("registering", binding, inspect reason)
             state
         end
 
       _ ->
-        Farmbot.Logger.error(1, "Error registering pin: pin already registered")
+        error_log("registering", binding, "already registered")
         state
     end
   end
 
-  def unregister_pin(state, %PinBinding{pin_num: pin_num}) do
+  def unregister_pin(state, %PinBinding{pin_num: pin_num} = binding) do
     case state.registered[pin_num] do
       nil ->
-        Farmbot.Logger.error(1, "Error unregistering pin: pin not unregistered")
+        error_log("unregistering", binding, "not registered")
         state
 
       %PinBinding{} = old ->
-        Farmbot.Logger.info 1, "Unregistering #{pin_num} from sequence by id"
         case @handler.unregister_pin(pin_num) do
           :ok ->
             do_unregister(state, old)
 
           {:error, reason} ->
-            Farmbot.Logger.error 1, "Error unregistering pin: #{inspect reason}"
+            error_log("unregistering", binding, inspect reason)
             state
         end
     end
   end
 
-  defp do_register(state, %PinBinding{pin_num: pin} = binding) do
-    %{state | registered: Map.put(state.registered, pin, binding)}
+  defp error_log(action_verb, binding , reason) do
+    Farmbot.Logger.error 1, "Error #{action_verb} Pin Binding #{binding} (#{reason})"
   end
 
-  defp do_unregister(state, %PinBinding{pin_num: pin_num}) do
-    %{state | registered: Map.delete(state.registered, pin_num)}
+  defp do_register(state, %PinBinding{pin_num: pin} = binding) do
+    Farmbot.Logger.debug 1, "Pin Binding #{binding} registered."
+    %{state | registered: Map.put(state.registered, pin, binding), signal: Map.put(state.signal, pin, nil)}
+  end
+
+  defp do_unregister(state, %PinBinding{pin_num: pin_num} = binding) do
+    Farmbot.Logger.debug 1, "Pin Binding #{binding} unregistered."
+    %{state | registered: Map.delete(state.registered, pin_num), signal: Map.delete(state.signal, pin_num)}
   end
 
   defp do_execute(%PinBinding{sequence_id: sequence_id}) when is_number(sequence_id) do
@@ -144,4 +169,14 @@ defmodule Farmbot.PinBinding.Manager do
       body: [] }
     |> Farmbot.CeleryScript.schedule_sequence()
   end
+
+  defp debounce_timer(pin) do
+    Process.send_after(self(), {pin, :ok}, 350)
+  end
+
+  defp do_usr_led(%PinBinding{pin_num: 26}, signal), do: do_write(:white1, signal)
+  defp do_usr_led(%PinBinding{pin_num: 5}, signal), do: do_write(:white2, signal)
+  defp do_usr_led(%PinBinding{pin_num: 20}, signal), do: do_write(:white3, signal)
+  defp do_usr_led(_, _), do: :ok
+  defp do_write(led, signal), do: apply(Farmbot.Leds, led, [signal])
 end

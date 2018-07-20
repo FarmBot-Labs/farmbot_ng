@@ -27,18 +27,19 @@ defmodule Farmbot.Target.PinBinding.AleHandler do
 
   defmodule PinState do
     @moduledoc false
-    defstruct [:pin, :state, :signal, :timer, :pid]
+    defstruct [:pin, :state, :signal, :pid]
   end
 
   def init([]) do
-    {:ok, struct(State, pins: %{})}
+    {:ok, %State{pins: %{}}}
   end
 
   def handle_call({:register_pin, num}, _from, state) do
     with {:ok, pid} <- GPIO.start_link(num, :input),
-         :ok <- GPIO.set_int(pid, :rising) do
-      {:reply, :ok,
-       %{state| pins: Map.put(state.pins,num,struct(PinState, pin: num, pid: pid, state: nil, signal: :rising))}}
+         :ok <- GPIO.set_int(pid, :both),
+         new_pins <-
+           Map.put(state.pins, num, %PinState{pin: num, pid: pid, state: nil, signal: :rising}) do
+      {:reply, :ok, %{state | pins: new_pins}}
     else
       {:error, _} = err -> {:reply, err, state}
       err -> {:reply, {:error, err}, state}
@@ -56,50 +57,10 @@ defmodule Farmbot.Target.PinBinding.AleHandler do
     end
   end
 
-  def handle_info({:gpio_interrupt, pin, :rising}, state) do
-    pin_state = state.pins[pin]
-
-    if pin_state.timer do
-      new_state = %{
-        state
-        | pins: %{state.pins | pin => %{pin_state | state: :rising}}
-      }
-
-      {:noreply, new_state}
-    else
-      timer = Process.send_after(self(), {:gpio_timer, pin}, 300)
-
-      new_state = %{
-        state
-        | pins: %{
-            state.pins
-            | pin => %{pin_state | timer: timer, state: :rising}
-          }
-      }
-      Farmbot.PinBinding.Manager.trigger(pin)
-      {:noreply, new_state}
-    end
-  end
-
   def handle_info({:gpio_interrupt, pin, signal}, state) do
     pin_state = state.pins[pin]
-
-    new_state = %{
-      state
-      | pins: %{state.pins | pin => %{pin_state | state: signal}}
-    }
-
+    new_state = %{state | pins: %{state.pins | pin => %{pin_state | state: signal}}}
+    Farmbot.PinBinding.Manager.trigger(pin, signal)
     {:noreply, new_state}
-  end
-
-  def handle_info({:gpio_timer, pin}, state) do
-    pin_state = state.pins[pin]
-
-    if pin_state do
-      new_pin_state = %{pin_state | timer: nil}
-      {:noreply, %{state | pins: %{state.pins | pin => new_pin_state}}}
-    else
-      {:noreply, state}
-    end
   end
 end

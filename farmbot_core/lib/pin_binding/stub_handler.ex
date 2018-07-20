@@ -43,7 +43,8 @@ defmodule Farmbot.PinBinding.StubHandler do
   end
 
   def handle_info({:do_test_fire, pin}, state) do
-    Farmbot.PinBinding.Manager.trigger(pin)
+    Farmbot.PinBinding.Manager.trigger(pin, :rising)
+    Farmbot.PinBinding.Manager.trigger(pin, :falling)
     {:noreply, state}
   end
 end
