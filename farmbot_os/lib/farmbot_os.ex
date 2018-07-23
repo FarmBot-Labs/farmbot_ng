@@ -9,7 +9,6 @@ defmodule Farmbot.OS do
     children = [
       {Farmbot.System.Init.Supervisor, []},
       {Farmbot.System.CoreStart, []},
-      {Farmbot.System.SeedDB, []},
       {Farmbot.Platform.Supervisor, []},
       {Farmbot.System.UpdateTimer, []},
       {Farmbot.System.ExtStart, []},

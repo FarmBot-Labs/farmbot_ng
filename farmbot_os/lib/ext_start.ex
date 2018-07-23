@@ -10,10 +10,7 @@ defmodule Farmbot.System.ExtStart do
 
   def init([]) do
     :ok = start_ext_app(Farmbot.BootState.read())
-    children = [
-      {Farmbot.System.Watchdog, [Farmbot.Ext, :farmbot_ext]}
-    ]
-    Supervisor.init(children, [strategy: :one_for_one])
+    Supervisor.init([], [strategy: :one_for_one])
   end
 
   defp start_ext_app(state) do
@@ -24,8 +21,7 @@ defmodule Farmbot.System.ExtStart do
       {:error, {:farmbot_ext, {{:shutdown, {:failed_to_start_child, child, reason}}, _}}} ->
         msg = "Failed to start farmbot_ext while in state: #{inspect state} child: #{child} => #{inspect reason}"
         Logger.error(msg)
-        Farmbot.System.factory_reset(msg)
-        {:error, msg}
+        :ok
     end
   end
 end

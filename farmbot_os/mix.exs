@@ -41,7 +41,7 @@ defmodule Farmbot.OS.MixProject do
   defp deps do
     [
       {:nerves, "~> 1.0", runtime: false},
-      {:shoehorn, "~> 0.2"},
+      {:shoehorn, "~> 0.3"},
 
       {:cowboy, "~> 1.0.0"},
       {:plug, "~> 1.0"},

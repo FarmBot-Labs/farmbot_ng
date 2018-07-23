@@ -52,13 +52,13 @@ defmodule Farmbot.AMQP.AutoSyncTransport do
         Farmbot.SettingsSync.run()
       "FbosConfig" ->
         Farmbot.SettingsSync.apply_fbos_map(Farmbot.Config.get_config_as_map()["settings"], body)
-      "FirmwareConfig" when is_nil(body) -> :Ok
+      "FirmwareConfig" when is_nil(body) -> :ok
       "FirmwareConfig" ->
         Farmbot.SettingsSync.apply_fw_map(Farmbot.Config.get_config_as_map()["hardware_params"], body)
       _ ->
-        cmd = Farmbot.Asset.register_sync_cmd(body["id"], asset_kind, body)
+        _cmd = Farmbot.Asset.register_sync_cmd(body["id"], asset_kind, body)
         if get_config_value(:bool, "settings", "auto_sync") do
-          Farmbot.Asset.apply_sync_cmd(cmd)
+          Farmbot.Asset.fragment_sync()
         end
     end
 

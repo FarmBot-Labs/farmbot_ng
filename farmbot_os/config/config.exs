@@ -9,11 +9,11 @@ use Mix.Config
 target = Mix.Project.config()[:target]
 env = Mix.env()
 
-# config :logger, [
-#   utc_log: true,
-#   handle_otp_reports: true,
-#   handle_sasl_reports: true,
-# ]
+config :logger, [
+  utc_log: true,
+  handle_otp_reports: true,
+  handle_sasl_reports: true,
+]
 
 # Customize non-Elixir parts of the firmware.  See
 # https://hexdocs.pm/nerves/advanced-configuration.html for details.
@@ -24,6 +24,7 @@ config :nerves, :firmware, rootfs_overlay: "rootfs_overlay"
 # involved with firmware updates.
 config :shoehorn,
   init: [:nerves_runtime, :nerves_init_gadget],
+  handler: Farmbot.OS.ShoehornHandler,
   app: Mix.Project.config()[:app]
 
 # Stop lager redirecting :error_logger messages
