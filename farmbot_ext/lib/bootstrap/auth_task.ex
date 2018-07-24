@@ -80,7 +80,6 @@ defmodule Farmbot.Bootstrap.AuthTask do
   end
 
   defp refresh_timer(pid, ms \\ @refresh_time) do
-    Timex.
     timer = Process.send_after(pid, :refresh, ms)
     {:noreply, timer, :hibernate}
   end
