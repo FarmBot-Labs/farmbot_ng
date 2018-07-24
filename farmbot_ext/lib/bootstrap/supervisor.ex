@@ -84,16 +84,9 @@ defmodule Farmbot.Bootstrap.Supervisor do
     cond do
       is_nil(email) -> exit("No email")
       is_nil(server) -> exit("No server")
-      password ->
-        actual_init(fn(e, pas, s) ->
-          Farmbot.Logger.debug 3, "Using password to authorize."
-          @auth_task.authorize_with_password(e, pas, s)
-        end, email, password, server)
-      secret -> actual_init(fn(e, sec, s) ->
-        Farmbot.Logger.debug 3, "Using secret to authorize."
-        @auth_task.authorize_with_secret(e, sec, s)
-      end, email, password, server)
-      true -> exit("No password or secret.")
+      is_nil(secret) && is_nil(password) -> exit("No password or secret.")
+      secret -> actual_init(&auth_with_secret/3, email, password, server)
+      password -> actual_init(&auth_with_password/3, email, password, server)
     end
   end
 
@@ -101,7 +94,7 @@ defmodule Farmbot.Bootstrap.Supervisor do
     busy_msg = "Beginning Bootstrap authorization: #{email} - #{server}"
     Farmbot.Logger.busy(2, busy_msg)
     # get a token
-    case fun.(email, password_or_secret, server) do
+    case apply_auth_fun(fun, [email, password_or_secret, server]) do
       {:ok, token} ->
         success_msg = "Successful Bootstrap authorization: #{email} - #{server}"
         Farmbot.Logger.success(2, success_msg)
@@ -120,5 +113,23 @@ defmodule Farmbot.Bootstrap.Supervisor do
 
       {:error, reason} -> exit(reason)
     end
+  end
+
+  defp apply_auth_fun(fun, args) do
+    try do
+      apply(fun, args)
+    rescue
+      e -> {:error, Exception.message(e)}
+    end
+  end
+
+  defp auth_with_secret(e, sec, s) do
+    Farmbot.Logger.debug 3, "Using secret to authorize."
+    @auth_task.authorize_with_secret(e, sec, s)
+  end
+
+  defp auth_with_password(e, pass, s) do
+    Farmbot.Logger.debug 3, "Using password to authorize."
+    @auth_task.authorize_with_password(e, pass, s)
   end
 end

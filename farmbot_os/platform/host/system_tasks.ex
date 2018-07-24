@@ -4,13 +4,11 @@ defmodule Farmbot.Host.SystemTasks do
   @behaviour Farmbot.System
 
   def reboot() do
-    # Application.stop(:farmbot_os)
-    # Application.ensure_all_started(:farmbot_os)
     shutdown()
   end
 
   def shutdown() do
-    :init.stop()
+    System.halt()
   end
 
   def stop(_), do: :ok

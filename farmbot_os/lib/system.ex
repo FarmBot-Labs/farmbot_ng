@@ -50,6 +50,7 @@ defmodule Farmbot.System do
     for p <- Path.wildcard(Path.join(@data_path, "*")) do
       File.rm_rf!(p)
     end
+    Farmbot.BootState.write(:NEEDS_CONFIGURATION)
     reboot(reason)
   end
 

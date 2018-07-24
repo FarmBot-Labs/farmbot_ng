@@ -349,7 +349,7 @@ defmodule Farmbot.Firmware.UartHandler do
 
   def handle_call({:update_param, param, val}, _from, state) do
     num = Farmbot.Firmware.Gcode.Param.parse_param(param)
-    do_write("F22 P#{num} V#{val}", state)
+    do_write("F22 P#{num} V#{fmnt_float(val)}", state)
   end
 
   def handle_call(:read_all_params, _from, state) do

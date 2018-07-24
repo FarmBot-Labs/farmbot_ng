@@ -20,8 +20,15 @@ defmodule Farmbot.System.ExtStart do
         :ok
       {:error, {:farmbot_ext, {{:shutdown, {:failed_to_start_child, child, reason}}, _}}} ->
         msg = "Failed to start farmbot_ext while in state: #{inspect state} child: #{child} => #{inspect reason}"
-        Logger.error(msg)
+        maybe_reset(msg)
         :ok
+    end
+  end
+
+  defp maybe_reset(msg) do
+    case Farmbot.Config.get_config_value(:bool, "settings", "first_boot") do
+      true -> Farmbot.System.factory_reset(msg)
+      false -> Logger.error(msg)
     end
   end
 end
