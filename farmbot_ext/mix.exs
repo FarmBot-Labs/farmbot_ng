@@ -25,8 +25,7 @@ defmodule Farmbot.Ext.MixProject do
   defp deps do
     [
       {:farmbot_core, path: "../farmbot_core", env: Mix.env()},
-      # TODO(Connor) JUN 20 - Remove me
-      {:ranch_proxy_protocol, github: "heroku/ranch_proxy_protocol", override: true},
+      {:ranch_proxy_protocol, "~> 2.0", override: true},
       {:httpoison, "~> 1.2"},
       {:jason, "~> 1.0"},
       {:uuid, "~> 1.1"},
