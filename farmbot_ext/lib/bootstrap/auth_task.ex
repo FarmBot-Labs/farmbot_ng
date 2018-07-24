@@ -32,9 +32,19 @@ defmodule Farmbot.Bootstrap.AuthTask do
 
   defp do_refresh do
     auth_task = Application.get_env(:farmbot_ext, :behaviour)[:authorization]
-    {email, pass, server} = {fetch_email(), fetch_pass(), fetch_server()}
+    email    = get_config_value(:string, "authorization", "email")
+    server   = get_config_value(:string, "authorization", "server")
+    password = get_config_value(:string, "authorization", "password")
+    secret   = get_config_value(:string, "authorization", "secret")
     Farmbot.Logger.busy(3, "refreshing token: #{email} - #{server}")
-    case auth_task.authorize_with_password(email, pass, server) do
+    cond do
+      is_nil(email) -> exit("No email")
+      is_nil(server) -> exit("No server")
+      is_nil(secret) && is_nil(password) -> exit("No password or secret.")
+      secret -> auth_task.authorize_with_secret(email, secret, server)
+      password -> auth_task.authorize_with_password(email, password, server)
+    end
+    |> case do
       {:ok, token} ->
         Farmbot.Logger.success(3, "Successful authorization: #{email} - #{server}")
         update_config_value(:bool, "settings", "first_boot", false)
@@ -70,22 +80,8 @@ defmodule Farmbot.Bootstrap.AuthTask do
   end
 
   defp refresh_timer(pid, ms \\ @refresh_time) do
+    Timex.
     timer = Process.send_after(pid, :refresh, ms)
     {:noreply, timer, :hibernate}
-  end
-
-  defp fetch_email do
-    email = get_config_value(:string, "authorization", "email")
-    email || raise "No email provided for token refresh."
-  end
-
-  defp fetch_pass do
-    pass = get_config_value(:string, "authorization", "password")
-    pass || raise "No password provided for token refresh."
-  end
-
-  defp fetch_server do
-    server = get_config_value(:string, "authorization", "server")
-    server || raise "No server provided for token refresh."
   end
 end
