@@ -6,10 +6,7 @@ Restructure of FarmbotOS to fix network and log errors.
    * Scheduling
    * Integration with `farmbot_core` somehow. (`@behaviour` maybe?)
 * Farmware
-   * HTTP Endpoint
-   * unix domain socket?
-   * lua?
-* CI
+
 * Error handling.
    * Avoid factory resetting at all costs
    * Where to put factory reset code? `farmbot_os` i guess?
@@ -18,8 +15,7 @@ Restructure of FarmbotOS to fix network and log errors.
 
 # Things that have been migrated
 * asset storage -> `farmbot_core`
-* farmbot_firmware (partially) -> `farmbot_core`
-   * missing arduino firmware build
+* farmbot_firmware -> `farmbot_core`
 * logging
    * storage -> `farmbot_core`
    * uploading -> `farmbot_ext`
@@ -35,19 +31,13 @@ Restructure of FarmbotOS to fix network and log errors.
 * auto sync messages -> `farmbot_ext`
 * Easter Eggs -> `farmbot_os` might move to `farmbot_ext`
 * OTA Updates -> `farmbot_os`
-* Networking -> `farmbot_os` (will need to be revisited.)
-   * Configurator
-   * NTP
-   * Setting node name is broken.
+* Networking -> `farmbot_os`
 * System things -> `farmbot_os`
-  * reboot/poweroff etc
-  * factory reset
 * System info -> `farmbot_os`
-  * wifi network level
-  * soc temp
 * Asset registry
 * pin bindings -> `farmbot_core`
-* led system -> `farmbot_os` + `farmbot_core`
+* led system -> `farmbot_os` + `farmbot_core`* C
+* CI
 
 # Things i am unsure about
 * CeleryScript - Has both network _and_ core requirements.
