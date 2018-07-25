@@ -127,6 +127,9 @@ jobs:
       - restore_cache:
           keys:
             - v4-fbos-host-test-dependency-cache-{{ checksum "farmbot_os/mix.lock.host" }}
+      - restore_cache:
+          keys:
+            - v4-fbcore-test-arduino-dependency-cache-{{ checksum ".circleci/setup-arduino.sh" }}
       - <<: *install_elixir
       - <<: *install_hex_rebar
       - <<: *install_nerves_bootstrap
@@ -155,6 +158,9 @@ jobs:
       - restore_cache:
           keys:
             - v4-fbos-rpi3-dev-nerves-cache-{{ checksum "farmbot_os/mix.lock.rpi3" }}
+      - restore_cache:
+          keys:
+            - v4-fbcore-test-arduino-dependency-cache-{{ checksum ".circleci/setup-arduino.sh" }}
       - <<: *install_elixir
       - <<: *install_hex_rebar
       - <<: *install_nerves_bootstrap
@@ -189,6 +195,9 @@ jobs:
       - restore_cache:
           keys:
             - v4-fbos-rpi3-prod-nerves-cache-{{ checksum "farmbot_os/mix.lock.rpi3" }}
+      - restore_cache:
+          keys:
+            - v4-fbcore-test-arduino-dependency-cache-{{ checksum ".circleci/setup-arduino.sh" }}
       - <<: *install_elixir
       - <<: *install_hex_rebar
       - <<: *install_nerves_bootstrap
@@ -235,6 +244,9 @@ jobs:
       - restore_cache:
           keys:
             - v4-fbos-rpi3-prod-nerves-cache-{{ checksum "farmbot_os/mix.lock.rpi3" }}
+      - restore_cache:
+          keys:
+            - v4-fbcore-test-arduino-dependency-cache-{{ checksum ".circleci/setup-arduino.sh" }}            
       - <<: *install_elixir
       - <<: *install_hex_rebar
       - <<: *install_nerves_bootstrap

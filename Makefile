@@ -21,11 +21,14 @@ help:
 farmbot_core_clean:
 	cd farmbot_core && \
 	make clean && \
+	rm -rf priv/*.hex &&\
 	rm -rf priv/*.so &&\
+	rm -rf ./.*.sqlite3 &&\
 	rm -rf _build deps
 
 farmbot_ext_clean:
 	cd farmbot_ext && \
+	rm -rf ./.*.sqlite3 &&\
 	rm -rf _build deps
 
 farmbot_os_clean:
@@ -55,8 +58,8 @@ test: farmbot_core_test farmbot_ext_test farmbot_os_test
 
 farmbot_os_firmware:
 	cd farmbot_os && \
-	MIX_ENV=$(MIX_ENV) MIX_TARGET=$(MIX_TARGET) SKIP_ARDUINO_BUILD=1 mix do deps.get, firmware
+	MIX_ENV=$(MIX_ENV) MIX_TARGET=$(MIX_TARGET) mix do deps.get, firmware
 
 farmbot_os_firmware_slack: farmbot_os_firmware
 	cd farmbot_os && \
-	MIX_ENV=$(MIX_ENV) MIX_TARGET=$(MIX_TARGET) SKIP_ARDUINO_BUILD=1 mix farmbot.firmware.slack --channels $(SLACK_CHANNEL)
+	MIX_ENV=$(MIX_ENV) MIX_TARGET=$(MIX_TARGET) mix farmbot.firmware.slack --channels $(SLACK_CHANNEL)

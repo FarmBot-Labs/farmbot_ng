@@ -22,6 +22,7 @@ defmodule FarmbotCore.MixProject do
       elixir: "~> 1.6",
       make_clean: ["clean"],
       make_env: make_env(),
+      make_cwd: __DIR__,
       compilers: [:elixir_make] ++ Mix.compilers(),
       version: @version,
       target: @target,
@@ -76,6 +77,7 @@ defmodule FarmbotCore.MixProject do
     case System.get_env("ERL_EI_INCLUDE_DIR") do
       nil ->
         %{
+          "MAKE_CWD" => __DIR__,
           "ERL_EI_INCLUDE_DIR" =>
             Path.join([:code.root_dir(), "usr", "include"]),
           "ERL_EI_LIBDIR" =>
@@ -84,7 +86,7 @@ defmodule FarmbotCore.MixProject do
         }
 
       _ ->
-        %{}
+        %{"MAKE_CWD" => __DIR__}
     end
   end
 end

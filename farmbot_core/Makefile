@@ -27,10 +27,10 @@ all: $(ALL)
 clean: $(CLEAN)
 
 fbos_arduino_firmware:
-	cd c_src/farmbot-arduino-firmware && make all BUILD_DIR=$(PWD)/_build FBARDUINO_FIRMWARE_SRC_DIR=$(PWD)/c_src/farmbot-arduino-firmware/src BIN_DIR=$(PWD)/priv
+	cd c_src/farmbot-arduino-firmware && make all BUILD_DIR=$(MAKE_CWD)/_build FBARDUINO_FIRMWARE_SRC_DIR=$(MAKE_CWD)/c_src/farmbot-arduino-firmware/src BIN_DIR=$(MAKE_CWD)/priv
 
 fbos_clean_arduino_firmware:
-	cd c_src/farmbot-arduino-firmware && make clean BUILD_DIR=$(PWD)/_build FBARDUINO_FIRMWARE_SRC_DIR=$(PWD)/c_src/farmbot-arduino-firmware/src BIN_DIR=$(PWD)/priv
+	cd c_src/farmbot-arduino-firmware && make clean BUILD_DIR=$(MAKE_CWD)/_build FBARDUINO_FIRMWARE_SRC_DIR=$(MAKE_CWD)/c_src/farmbot-arduino-firmware/src BIN_DIR=$(MAKE_CWD)/priv
 
 fbos_build_calendar_nif:
 	make -f c_src/build_calendar/Makefile all ERL_EI_INCLUDE_DIR=$(ERL_EI_INCLUDE_DIR) ERL_EI_LIBDIR=$(ERL_EI_LIBDIR)
